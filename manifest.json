@@ -2,8 +2,8 @@
 	"name": "Target Blank",
 	"description": "Makes links open in a new tab/window by default.",
 	"icons": {
-		"48": "icon_48.png",
-		"128": "icon_128.png"
+		// "48": "icon_48.png",
+		// "128": "icon_128.png"
 	},
 	"version": "0.1.0",
 	"manifest_version": 2,
@@ -16,7 +16,7 @@
 	},
 	"browser_action": {
 		"default_title": "Makes links open in a new tab/window by default.",
-		"default_icon": "",
+		// "default_icon": "",
 		"default_popup": "popup.html"
 	},
 	"content_scripts": [{
