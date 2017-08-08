@@ -7,7 +7,7 @@ chrome.runtime.onConnect.addListener( port => {
           currentWindow: true
         }, tabs => {
           console.log(tabs)
-          chrome.tabs.create({ url: info.url, active: false, index: tabs[0].index + 1 });
+          chrome.tabs.create({ url: info.url, active: true, index: tabs[0].index + 1 });
         })
         // console.log(info);
         // chrome.tabs.create({ url: info.url, active: false, index: 0 })
