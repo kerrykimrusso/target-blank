@@ -11,10 +11,32 @@
 </head>
 
 <body>
-    Select which key-click combo you want to open in the same window:
+    Select which key-click combo opens a link in the current tab:
     <select id="key">
-        <option value="red">command</option>
-        <option value="green">alt/opiton</option>
+        <option value="new-tab">command</option>
+        <option value="same-tab">alt/option</option>
+    </select>
+
+   How to open relative links
+    <select id="relative">
+        <option value="new-tab">new tab</option>
+        <option value="same-tab">same tag</option>
+        <option value="ignore">ignore</option>
+    </select>
+
+    How to open absolute links
+    <select id="absolute">
+        <option value="new-tab">new tab</option>
+        <option value="same-tab">same tag</option>
+        <option value="ignore">ignore</option>
+    </select>
+
+    New tab appears at:
+    <select id="tab">
+        <option value="start">Start of tab list</option>
+        <option value="end">End of tab list</option>
+        <option value="left">Left of current tab</option>
+        <option value="right">Right of current tab</option>
     </select>
 
     <div id="status"></div>
@@ -24,3 +46,13 @@
 </body>
 
 </html>
+
+<!-- Command Shortcut HTML
+<div class="extension-command-details">
+        <div class="command-container">
+          <span class="command-description">Toggle feature foo</span>
+          <span class="command-shortcut-container"><span class="command-shortcut clearable inactive-keybinding"><img class="command-clear" src="chrome://theme/IDR_EXTENSION_COMMAND_CLOSE" style="content: -webkit-image-set(url('chrome://theme/IDR_EXTENSION_COMMAND_CLOSE') 1x, url('chrome://theme/IDR_EXTENSION_COMMAND_CLOSE@2x') 2x);" id="clear-fkifcafjpcknpoflbjhamippgjofncii-toggle-feature-foo" title="Delete shortcut"><span class="command-shortcut-text" tabindex="0">Not set</span></span></span>
+          <select class="command-scope" id="setCommandScope-fkifcafjpcknpoflbjhamippgjofncii-toggle-feature-foo" disabled=""><option>In Chrome</option></select>
+        </div>
+      </div>
+-->
