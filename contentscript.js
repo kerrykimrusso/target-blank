@@ -1,6 +1,6 @@
 (function() {
-    const aTags = document.querySelectorAll("a");
-    aTags.forEach(a => a.addEventListener('click', e => {   
+    const anchors = document.querySelectorAll("a");
+    anchors.forEach(a => a.addEventListener('click', e => {   
         e.preventDefault();    
         let node = e.target;
         let href = node.getAttribute('href');
