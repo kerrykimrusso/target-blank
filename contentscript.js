@@ -1,5 +1,7 @@
 (function() {
-    window.addEventListener('click', e => {
+    const aTags = document.querySelectorAll("a");
+    aTags.forEach(a => a.addEventListener('click', e => {   
+        e.preventDefault();    
         let node = e.target;
         let href = node.getAttribute('href');
         
@@ -16,6 +18,6 @@
             // chrome.tabs.create({ active: false });
             chrome.runtime.connect().postMessage({ "url" : href });
         }
-        e.preventDefault();    
-    });
+
+    }));
 })();
