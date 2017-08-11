@@ -2,47 +2,45 @@
 <html>
 
 <head>
-    <title>Target Blank Extension Options</title>
-    <style>
-        body {
-            padding: 10px;
-        }
-    </style>
+  <title>Target Blank Extension Options</title>
+  <style>
+    body {
+      padding: 10px;
+    }
+  </style>
 </head>
 
+
 <body>
-    Select which key-click combo opens a link in the current tab:
-    <select id="key">
+  Select which key-click combo opens a link in the current tab: <br>
+  <select id="key">
         <option value="new-tab">command</option>
         <option value="same-tab">alt/option</option>
     </select>
-
-   How to open relative links
-    <select id="relative">
+  <br> How to open relative links: <br>
+  <select id="relative">
         <option value="new-tab">new tab</option>
         <option value="same-tab">same tag</option>
         <option value="ignore">ignore</option>
     </select>
-
-    How to open absolute links
-    <select id="absolute">
+  <br> How to open absolute links: <br>
+  <select id="absolute">
         <option value="new-tab">new tab</option>
         <option value="same-tab">same tag</option>
         <option value="ignore">ignore</option>
     </select>
-
-    New tab appears at:
-    <select id="tab">
+  <br> New tab appears at: <br>
+  <select id="tab">
         <option value="start">Start of tab list</option>
         <option value="end">End of tab list</option>
         <option value="left">Left of current tab</option>
         <option value="right">Right of current tab</option>
     </select>
+  <br>
+  <div id="status"></div>
+  <button id="save">Save</button>
 
-    <div id="status"></div>
-    <button id="save">Save</button>
-
-    <script src="options.js"></script>
+  <script src="options.js"></script>
 </body>
 
 </html>
