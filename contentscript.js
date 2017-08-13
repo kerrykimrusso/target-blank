@@ -6,6 +6,7 @@
     let href = a.getAttribute('href');
 
     // check for null href or page anchors (since a # could just be a placeholder)
+    // also check for google app/google account buttons
     if (!href || href.startsWith('#') || /^Google (apps|Account)/.test(a.title)) return;
 
     a.addEventListener('click', e => {
