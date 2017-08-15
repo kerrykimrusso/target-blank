@@ -6,7 +6,7 @@
     let href = a.getAttribute('href');
 
     // check for null href or page anchors (since a # could just be a placeholder)
-    if (!href || href.startsWith('#')) return;
+    if (!href || href.startsWith('#') || !!a.onclick) return;
 
     a.addEventListener('click', e => {
 
