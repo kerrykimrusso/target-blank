@@ -27,6 +27,11 @@
       "all_frames": true
     },
     {
+      "matches": ["http://*.yahoo.com/*", "https://*.yahoo.com/*", "http://yahoo.com/*", "https://yahoo.com/*"],
+      "js": ["strategies/yahoo.js"],
+      "all_frames": true
+    },
+    {
       "matches": ["http://*/*", "https://*/*"],
       "js": ["contentscript.js"],
       "all_frames": true
