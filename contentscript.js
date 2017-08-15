@@ -9,10 +9,10 @@
     // also check for google app/google account buttons
     if (!href || href.startsWith('#') || !!a.onclick) return;
     
-    if(window.strategy.matchesDomain(window.location.origin)) {
+    if(window.strategy && window.strategy.matchesDomain(window.location.origin)) {
       if(window.strategy.shouldIgnore(a)) return;
     }
-    
+
     a.addEventListener('click', e => {
 
       // if the user is holding the cmd key or the href is a full path, load in the same window
