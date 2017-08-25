@@ -20,11 +20,23 @@
 		// "default_icon": "",
 		"default_popup": "popup.html"
 	},
-	"content_scripts": [{
-		"matches": ["http://*/*", "https://*/*"],
-		"js": ["contentscript.js"],
-		"all_frames": true
-	}],
+  "content_scripts": [
+    {
+      "matches": ["http://*.google.com/*", "https://*.google.com/*", "http://google.com/*", "https://google.com/*"],
+      "js": ["strategies/google.js"],
+      "all_frames": true
+    },
+    {
+      "matches": ["http://*.yahoo.com/*", "https://*.yahoo.com/*", "http://yahoo.com/*", "https://yahoo.com/*"],
+      "js": ["strategies/yahoo.js"],
+      "all_frames": true
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["contentscript.js"],
+      "all_frames": true
+    }
+  ],
 	"options_ui": {
 		"page": "options.html",
 		"chrome_style": true
