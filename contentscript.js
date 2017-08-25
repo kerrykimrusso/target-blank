@@ -6,7 +6,7 @@
 
     // check for null href or page anchors (since a # could just be a placeholder)
 
-    if (!href || href.startsWith('#') || !!a.onclick || href.startsWith(window.origin)) return;
+    if (!href || href.startsWith('#') || !!a.onclick || href.startsWith(`http://${window.location.host}`) || href.startsWith(`https://${window.location.host}`)) return;
 
     if (window.strategy && window.strategy.matchesDomain(window.location.origin)) {
       if (window.strategy.shouldIgnore(a)) return;
