@@ -5,7 +5,7 @@
     const href = a.getAttribute('href');
 
     // check for null href or page anchors (since a # could just be a placeholder)
-    // also check for google app/google account buttons
+
     if (!href || href.startsWith('#') || !!a.onclick || href.startsWith(window.origin)) return;
 
     if (window.strategy && window.strategy.matchesDomain(window.location.origin)) {
