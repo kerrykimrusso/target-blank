@@ -4,7 +4,7 @@ window.strategy = (function init() {
   };
 
   const shouldIgnore = function shouldIgnore(a) {
-    return a.href.startsWith(window.location.origin);
+    return a.href.startsWith(window.origin);
   };
 
   return {
