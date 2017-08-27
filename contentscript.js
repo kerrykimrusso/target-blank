@@ -1,4 +1,5 @@
 (function init() {
+  const options = {};
   const anchors = document.querySelectorAll('a');
 
   anchors.forEach((a) => {
@@ -24,4 +25,21 @@
       }
     });
   });
+
+  function updateOptions(onSuccess) {
+    chrome.storage.sync.get(null, onSuccess);
+  }
+
+  function onOptionsRetrieved(curOptions) {
+    Object.assign(options, curOptions);
+  }
+
+  function onOptionsChanged(changes) {
+    Object.keys(changes).forEach((key) => {
+      options[key] = changes[key].newValue;
+    });
+  }
+
+  chrome.storage.onChanged.addListener(onOptionsChanged);
+  updateOptions(onOptionsRetrieved);
 }());
