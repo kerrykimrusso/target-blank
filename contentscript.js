@@ -20,7 +20,11 @@
       } else {
         e.preventDefault();
         chrome.runtime.connect().postMessage({
-          url: href,
+          type: 'NEW_TAB',
+          payload: {
+            url: href,
+            options,
+          },
         });
       }
     });
