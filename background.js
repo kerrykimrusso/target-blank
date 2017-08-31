@@ -1,18 +1,36 @@
-// chrome.storage.sync.get({}, );
 let tabCount = 0;
 
+function getPosition(tabs, val) {
+  switch (val) {
+    case 'start':
+      return 0;
+    case 'end':
+      return tabCount;
+    case 'left':
+      return tabs[0].index;
+    default: // 'right'
+      return tabs[0].index + 1;
+  }
+}
+
 chrome.runtime.onConnect.addListener((port) => {
-  port.onMessage.addListener((info) => {
-    chrome.tabs.query({
-      active: true,
-      currentWindow: true,
-    }, (tabs) => {
-      chrome.tabs.create({
-        url: info.url,
+  const messageHandlers = {
+    NEW_TAB: (payload) => {
+      chrome.tabs.query({
         active: true,
-        index: tabs[0].index + 1,
+        currentWindow: true,
+      }, (tabs) => {
+        chrome.tabs.create({
+          url: payload.url,
+          active: true,
+          index: getPosition(tabs, payload.options.tab),
+        });
       });
-    });
+    },
+  };
+
+  port.onMessage.addListener((info) => {
+    messageHandlers[info.type](info.payload);
   });
 });
 
@@ -21,7 +39,6 @@ function getTabCount() {
     currentWindow: true,
   }, (tabs) => {
     tabCount = tabs.length;
-    console.log(tabCount);
   });
 }
 

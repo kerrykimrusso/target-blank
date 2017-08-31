@@ -1,4 +1,5 @@
 (function init() {
+  const options = {};
   const anchors = document.querySelectorAll('a');
 
   anchors.forEach((a) => {
@@ -19,9 +20,30 @@
       } else {
         e.preventDefault();
         chrome.runtime.connect().postMessage({
-          url: href,
+          type: 'NEW_TAB',
+          payload: {
+            url: href,
+            options,
+          },
         });
       }
     });
   });
+
+  function updateOptions(onSuccess) {
+    chrome.storage.sync.get(null, onSuccess);
+  }
+
+  function onOptionsRetrieved(curOptions) {
+    Object.assign(options, curOptions);
+  }
+
+  function onOptionsChanged(changes) {
+    Object.keys(changes).forEach((key) => {
+      options[key] = changes[key].newValue;
+    });
+  }
+
+  chrome.storage.onChanged.addListener(onOptionsChanged);
+  updateOptions(onOptionsRetrieved);
 }());
