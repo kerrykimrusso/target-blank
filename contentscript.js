@@ -23,7 +23,6 @@
         // if( true /*check user setting for cmd + clicks*/) window.location = href;
       } else {
         e.preventDefault();
-        console.log("I'm in the else!");
         chrome.runtime.connect().postMessage({
           type: 'NEW_TAB',
           payload: {
