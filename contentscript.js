@@ -15,10 +15,15 @@
 
     a.addEventListener('mousedown', (e) => {
       // if the user is holding the cmd key or the href is a full path, load in the same window
+
+      // ignore if middle or right click
+      if (e.which > 1 && e.which < 4) return;
+
       if (e.metaKey || !/(\w+:\/\/)|(\W\w+%3A%2F%2F)/.test(href)) {
         // if( true /*check user setting for cmd + clicks*/) window.location = href;
       } else {
         e.preventDefault();
+        console.log("I'm in the else!");
         chrome.runtime.connect().postMessage({
           type: 'NEW_TAB',
           payload: {
