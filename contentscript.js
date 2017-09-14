@@ -1,46 +1,23 @@
 (function init() {
-  const options = {};
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get(null, resolve);
+  });
+})()
+.then(options => {
+
   const anchors = document.querySelectorAll('a');
 
-  anchors.forEach((a) => {
-    const href = a.getAttribute('href');
+  chrome.storage.onChanged.addListener(onOptionsChanged);
 
-    // check for null href or page anchors (since a # could just be a placeholder)
-
-    if (!href || href.startsWith('#') || !!a.onclick || href.startsWith(`http://${window.location.host}`) || href.startsWith(`https://${window.location.host}`)) return;
+  anchors.forEach((anchor) => {
+    const href = anchor.href;
 
     if (window.strategy && window.strategy.matchesDomain(window.location.origin)) {
-      if (window.strategy.shouldIgnore(a)) return;
+      if (window.strategy.shouldIgnore(anchor)) return;
     }
 
-    a.addEventListener('mousedown', (e) => {
-      // if the user is holding the cmd key or the href is a full path, load in the same window
-
-      // ignore if middle or right click
-      if (e.which > 1 && e.which < 4) return;
-
-      if (e.metaKey || !/(\w+:\/\/)|(\W\w+%3A%2F%2F)/.test(href)) {
-        // if( true /*check user setting for cmd + clicks*/) window.location = href;
-      } else {
-        e.preventDefault();
-        chrome.runtime.connect().postMessage({
-          type: 'NEW_TAB',
-          payload: {
-            url: href,
-            options,
-          },
-        });
-      }
-    });
+    anchor.addEventListener('mousedown', tabOption(anchor));
   });
-
-  function updateOptions(onSuccess) {
-    chrome.storage.sync.get(null, onSuccess);
-  }
-
-  function onOptionsRetrieved(curOptions) {
-    Object.assign(options, curOptions);
-  }
 
   function onOptionsChanged(changes) {
     Object.keys(changes).forEach((key) => {
@@ -48,6 +25,80 @@
     });
   }
 
-  chrome.storage.onChanged.addListener(onOptionsChanged);
-  updateOptions(onOptionsRetrieved);
-}());
+  function anchorType(anchor) {
+    const href = anchor.getAttribute('href');
+    const fullPath = anchor.href;
+
+    if (!href || href.startsWith('#') || !!anchor.onclick) return 'button';
+    if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
+      return 'relative';
+    } else {
+      return 'absolute';
+    }
+  }
+
+  function tabOption(anchor) {
+
+    const type = anchorType(anchor);
+
+    switch (options[type]) {
+
+      case 'new-tab':
+        return (e) => {
+          // if the user is holding the cmd key or the href is a full path, load in the same window
+
+          // ignore if middle or right click
+          if (e.which > 1 && e.which < 4) return;
+
+          if (shouldDoOpposite(e)) {
+            openInSameTab();
+          } else {
+            e.preventDefault();
+            openInNewTab(anchor.href);
+          }
+        }
+
+      case 'same-tab':
+        anchor.target = '';
+        return (e) => {
+          // if the user is holding the cmd key or the href is a full path, load in the same window
+
+          // ignore if middle or right click
+          if (e.which > 1 && e.which < 4) return;
+
+          if (shouldDoOpposite(e)) {
+            e.preventDefault();
+            openInNewTab(anchor.href);
+          } else {
+            openInSameTab();
+          }
+        }
+
+      default:
+        return () => true;
+    }
+
+    function openInSameTab() {
+      return true;
+    }
+
+    function openInNewTab(href) {
+      chrome.runtime.connect().postMessage({
+        type: 'NEW_TAB',
+        payload: {
+          url: href,
+          options,
+        },
+      });
+    }
+
+    function shouldDoOpposite(e) {
+      return options.key === 'command' ? e.metaKey : e.altKey;
+    }
+  }
+
+});
+
+
+// Proxy link check???
+// !/(\w+:\/\/)|(\W\w+%3A%2F%2F)/.test(href)
