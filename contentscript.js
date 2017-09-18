@@ -28,19 +28,24 @@
       });
     }
 
-    function anchorType(anchor) {
+    function anchorType(anchor, strategy) {
       const href = anchor.getAttribute('href');
       const fullPath = anchor.href;
 
       if (!href || href.startsWith('#') || !!anchor.onclick) return 'button';
-      if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
+
+      if (strategy &&
+        ('shouldTreatAsAbsolute' in strategy) &&
+        strategy.shouldTreatAsAbsolute(anchor)) {
+        return 'absolute';
+      } else if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
         return 'relative';
       }
       return 'absolute';
     }
 
-    function tabOption(anchor) {
-      const type = anchorType(anchor);
+    function tabOption(anchor, strategy) {
+      const type = anchorType(anchor, strategy);
 
       switch (options[type]) {
         case 'new-tab':
@@ -88,6 +93,6 @@
         if (window.strategy.shouldIgnore(anchor)) return;
       }
 
-      anchor.addEventListener('mousedown', tabOption(anchor));
+      anchor.addEventListener('mousedown', tabOption(anchor, window.strategy));
     });
   });
