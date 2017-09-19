@@ -37,7 +37,6 @@
       if (strategy &&
         ('shouldTreatAsAbsolute' in strategy) &&
         strategy.shouldTreatAsAbsolute(anchor)) {
-        console.log(anchor.href);
         return 'absolute';
       } else if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
         return 'relative';
@@ -100,7 +99,6 @@
 
     const observer = new MutationSummary({
       callback: (summaryObjects) => {
-        console.log(summaryObjects[0].added);
         attachLinkBehavior(summaryObjects[0].added);
       },
       queries: [
