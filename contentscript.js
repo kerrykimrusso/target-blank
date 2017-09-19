@@ -79,15 +79,28 @@
       }
     }
 
+    function attachLinkBehavior(anchors) {
+      anchors.forEach((anchor) => {
+        if (window.strategy && window.strategy.matchesDomain(window.location.origin)) {
+          if (window.strategy.shouldIgnore(anchor)) return;
+        }
+
+        anchor.addEventListener('mousedown', tabOption(anchor));
+      });
+    }
+
     const anchors = document.querySelectorAll('a');
+    attachLinkBehavior(anchors);
 
     chrome.storage.onChanged.addListener(onOptionsChanged);
 
-    anchors.forEach((anchor) => {
-      if (window.strategy && window.strategy.matchesDomain(window.location.origin)) {
-        if (window.strategy.shouldIgnore(anchor)) return;
-      }
+    function onDomMutated(mutations) {
+      console.log(mutations);
+    }
 
-      anchor.addEventListener('mousedown', tabOption(anchor));
+    const domObserver = new MutationObserver(onDomMutated);
+    domObserver.observe(document, {
+      childList: true,
+      subtree: true,
     });
   });
