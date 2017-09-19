@@ -32,7 +32,7 @@
       const href = anchor.getAttribute('href');
       const fullPath = anchor.href;
 
-      if (!href || href.startsWith('#') || !!anchor.onclick) return 'button';
+      if (!href || href.startsWith('#') || href.startsWith('javascript') || !!anchor.onclick) return 'button';
       if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
         return 'relative';
       }
