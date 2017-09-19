@@ -92,15 +92,15 @@
     const anchors = document.querySelectorAll('a');
     attachLinkBehavior(anchors);
 
-    chrome.storage.onChanged.addListener(onOptionsChanged);
-
-    function onDomMutated(mutations) {
-      console.log(mutations);
-    }
-
-    const domObserver = new MutationObserver(onDomMutated);
-    domObserver.observe(document, {
-      childList: true,
-      subtree: true,
+    const observer = new MutationSummary({
+      callback: (summaryObjects) => {
+        console.log(summaryObjects[0].added);
+        attachLinkBehavior(summaryObjects[0].added);
+      },
+      queries: [
+        { element: 'a' },
+      ],
     });
+
+    chrome.storage.onChanged.addListener(onOptionsChanged);
   });

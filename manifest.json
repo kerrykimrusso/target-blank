@@ -33,7 +33,7 @@
     },
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["contentscript.js"],
+      "js": ["vendors/mutation-summary.js", "contentscript.js"],
       "all_frames": true
     }
   ],
