@@ -30,10 +30,15 @@
       "matches": ["http://*.yahoo.com/*", "https://*.yahoo.com/*", "http://yahoo.com/*", "https://yahoo.com/*"],
       "js": ["strategies/yahoo.js"],
       "all_frames": true
+		},
+		{
+      "matches": ["http://*.github.com/*", "https://*.github.com/*", "http://github.com/*", "https://github.com/*"],
+      "js": ["strategies/github.js"],
+      "all_frames": true
     },
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["contentscript.js"],
+      "js": ["vendors/mutation-summary.js", "contentscript.js"],
       "all_frames": true
     }
   ],

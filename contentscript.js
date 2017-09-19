@@ -28,19 +28,24 @@
       });
     }
 
-    function anchorType(anchor) {
+    function anchorType(anchor, strategy) {
       const href = anchor.getAttribute('href');
       const fullPath = anchor.href;
 
       if (!href || href.startsWith('#') || href.startsWith('javascript') || !!anchor.onclick) return 'button';
-      if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
+
+      if (strategy &&
+        ('shouldTreatAsAbsolute' in strategy) &&
+        strategy.shouldTreatAsAbsolute(anchor)) {
+        return 'absolute';
+      } else if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
         return 'relative';
       }
       return 'absolute';
     }
 
-    function tabOption(anchor) {
-      const type = anchorType(anchor);
+    function tabOption(anchor, strategy) {
+      const type = anchorType(anchor, strategy);
 
       switch (options[type]) {
         case 'new-tab':
@@ -79,15 +84,27 @@
       }
     }
 
+    function attachLinkBehavior(anchors) {
+      anchors.forEach((anchor) => {
+        if (window.strategy && window.strategy.matchesDomain(window.location.origin)) {
+          if (window.strategy.shouldIgnore(anchor)) return;
+        }
+
+        anchor.addEventListener('mousedown', tabOption(anchor, window.strategy));
+      });
+    }
+
     const anchors = document.querySelectorAll('a');
+    attachLinkBehavior(anchors);
+
+    const observer = new MutationSummary({
+      callback: (summaryObjects) => {
+        attachLinkBehavior(summaryObjects[0].added);
+      },
+      queries: [
+        { element: 'a' },
+      ],
+    });
 
     chrome.storage.onChanged.addListener(onOptionsChanged);
-
-    anchors.forEach((anchor) => {
-      if (window.strategy && window.strategy.matchesDomain(window.location.origin)) {
-        if (window.strategy.shouldIgnore(anchor)) return;
-      }
-
-      anchor.addEventListener('mousedown', tabOption(anchor));
-    });
   });
