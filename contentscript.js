@@ -23,6 +23,7 @@
     }
 
     function onOptionsChanged(changes) {
+      console.log(changes);
       Object.keys(changes).forEach((key) => {
         options[key] = changes[key].newValue;
       });
@@ -44,15 +45,22 @@
       return 'absolute';
     }
 
+    function hasSleepTimer() {
+      return !!options.expiration && options.expiration > Date.now();
+    }
+
     function tabOption(anchor, strategy) {
       const type = anchorType(anchor, strategy);
 
       switch (options[type]) {
         case 'new-tab':
           return (e) => {
-          // if the user is holding the cmd key or the href is a full path, load in the same window
+            // if there the sleep timer is running
+            if (hasSleepTimer()) return;
 
-          // ignore if middle or right click
+            // if the user is holding the cmd key or the href is a full path, load in the same window
+
+            // ignore if middle or right click
             if (e.which > 1 && e.which < 4) return;
 
             if (shouldDoOpposite(e)) {
@@ -66,9 +74,12 @@
         case 'same-tab':
           anchor.target = '';
           return (e) => {
-          // if the user is holding the cmd key or the href is a full path, load in the same window
+          // if there the sleep timer is running
+            if (hasSleepTimer()) return;
 
-          // ignore if middle or right click
+            // if the user is holding the cmd key or the href is a full path, load in the same window
+
+            // ignore if middle or right click
             if (e.which > 1 && e.which < 4) return;
 
             if (shouldDoOpposite(e)) {

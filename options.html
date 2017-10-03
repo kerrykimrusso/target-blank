@@ -48,7 +48,24 @@
 </head>
 
 <body>
+  
+  <form id="sleepTimerForm" >
+    <div class="setting">
+        <label><span class="label-text">Sleep for:</span>
+          <select name="duration">
+            <option id="blank" value="0"></option>
+            <option id="five-minutes" value="300000">5 minutes</option>
+            <option id="fifteen-minutes" value="900000">15 minutes</option>
+            <option id="thirty-minutes" value="1800000">30 minutes</option>
+            <option id="one-hour" value="3600000">1 hour</option>
+          </select>
+          <input type="submit" name="sleep" value="Start" />
+        </label>
+      </div> 
+  </form>
+
   <form id="optionsForm">
+
     <div class="setting">
       <label><span class="label-text">Open relative links in:</span>
         <select name="relative">

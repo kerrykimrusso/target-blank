@@ -48,5 +48,21 @@ function restoreOptions() {
   });
 }
 
+function setSleepTimer(e) {
+  e.preventDefault();
+
+  const duration = parseInt(e.target.duration.value, 10);
+  const expiration = Date.now() + duration;
+
+
+  chrome.storage.sync.set({ expiration }, () => {
+    chrome.runtime.connect().postMessage({
+      type: 'SLEEP_SET',
+      payload: expiration,
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', restoreOptions);
 document.getElementById('optionsForm').addEventListener('submit', saveOptions);
+document.getElementById('sleepTimerForm').addEventListener('submit', setSleepTimer);
