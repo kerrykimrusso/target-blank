@@ -1,3 +1,34 @@
+let sleepTimerInterval;
+
+function formatFinalCountdown(timeRemaining) {
+  const hours = Math.floor(timeRemaining / 3600000);
+  const minutes = Math.floor((timeRemaining % 3600000) / 60000);
+  const seconds = Math.floor((timeRemaining % 60000) / 1000);
+
+  const padStart = String.prototype.padStart;
+
+  let formatted = hours > 0 ? `${hours}:` : '';
+  formatted += hours > 0 || minutes > 0 ? `${padStart.call(minutes, 2, '0')}:` : '';
+  formatted += hours > 0 || minutes > 0 || seconds > 0 ? `${padStart.call(seconds, 2, '0')}` : '';
+  return formatted;
+}
+
+
+function initFinalCountdown(expiration) {
+  function onSleepTimerInterval() {
+    const timeRemaining = expiration - Date.now();
+    if (timeRemaining <= 0) {
+      clearInterval(sleepTimerInterval);
+    } else {
+      const finalCountdown = document.getElementById('finalCountdown');
+      finalCountdown.textContent = formatFinalCountdown(timeRemaining);
+    }
+  }
+
+  sleepTimerInterval = setInterval(onSleepTimerInterval, 1000);
+  onSleepTimerInterval();
+}
+
 // Saves options to chrome.storage.sync.
 function saveOptions(e) {
   e.preventDefault();
@@ -29,26 +60,45 @@ function restoreOptions() {
     relative: 'same-tab',
     absolute: 'new-tab',
     tab: 'right',
+    expiration: 0,
   };
 
   chrome.storage.sync.get(defaultOptions, (curOptions) => {
     // update options.html
     // looping over keys works for now if we're sticking to all dropdown lists
     Object.keys(curOptions).forEach((key) => {
-      document.querySelector(`select[name=${key}]`).namedItem(curOptions[key]).setAttribute('selected', true);
+      const el = document.querySelector(`select[name=${key}]`);
+      if (el) el.namedItem(curOptions[key]).setAttribute('selected', true);
     });
+
+    initFinalCountdown(curOptions.expiration);
   });
 }
 
 function setSleepTimer(e) {
   e.preventDefault();
 
+  if (sleepTimerInterval) clearInterval(sleepTimerInterval);
+
   const duration = parseInt(e.target.duration.value, 10);
   const expiration = Date.now() + duration;
 
-  chrome.storage.sync.set({ expiration });
+  chrome.storage.sync.set({ expiration }, () => {
+    initFinalCountdown(expiration);
+  });
+}
+
+function cancelSleepTimer(e) {
+  e.preventDefault();
+
+  chrome.storage.sync.set({ expiration: 0 }, () => {
+    if (sleepTimerInterval) clearInterval(sleepTimerInterval);
+    const finalCountdown = document.getElementById('finalCountdown');
+    finalCountdown.textContent = '';
+  });
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions);
 document.getElementById('optionsForm').addEventListener('submit', saveOptions);
 document.getElementById('sleepTimerForm').addEventListener('submit', setSleepTimer);
+document.getElementById('cancelSleeptimer').addEventListener('click', cancelSleepTimer);
