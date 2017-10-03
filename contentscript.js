@@ -23,7 +23,6 @@
     }
 
     function onOptionsChanged(changes) {
-      console.log(changes);
       Object.keys(changes).forEach((key) => {
         options[key] = changes[key].newValue;
       });

@@ -18,14 +18,6 @@ function saveOptions(e) {
     setTimeout(() => {
       status.textContent = '';
     }, 750);
-
-    // TODO message the content-script with new options
-    chrome.runtime.connect().postMessage({
-      type: 'OPTIONS_UPDATED',
-      payload: {
-        options: newOptions,
-      },
-    });
   });
 }
 
@@ -54,13 +46,7 @@ function setSleepTimer(e) {
   const duration = parseInt(e.target.duration.value, 10);
   const expiration = Date.now() + duration;
 
-
-  chrome.storage.sync.set({ expiration }, () => {
-    chrome.runtime.connect().postMessage({
-      type: 'SLEEP_SET',
-      payload: expiration,
-    });
-  });
+  chrome.storage.sync.set({ expiration });
 }
 
 document.addEventListener('DOMContentLoaded', restoreOptions);
