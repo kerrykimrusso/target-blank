@@ -48,23 +48,6 @@
 </head>
 
 <body>
-  
-  <form id="sleepTimerForm" >
-    <div class="setting">
-        <label><span class="label-text">Sleep for:</span>
-          <select name="duration">
-            <option id="blank" value="0"></option>
-            <option id="five-minutes" value="300000">5 minutes</option>
-            <option id="fifteen-minutes" value="900000">15 minutes</option>
-            <option id="thirty-minutes" value="1800000">30 minutes</option>
-            <option id="one-hour" value="3600000">1 hour</option>
-          </select>
-          <input type="submit" name="sleep" value="Start" />
-          <button id="cancelSleeptimer">Cancel</button>
-          <span id="finalCountdown"></span>
-        </label>
-      </div> 
-  </form>
 
   <form id="optionsForm">
 
@@ -87,17 +70,6 @@
         </select>
       </label>
     </div>
-    
-    <div class="setting">
-      <label><span class="label-text">New tab appears at:</span>
-        <select name="tab">
-          <option id="start" value="start">Start of tab list</option>
-          <option id="end" value="end">End of tab list</option>
-          <option id="left" value="left">Left of current tab</option>
-          <option id="right" value="right">Right of current tab</option>
-        </select>
-      </label>
-    </div>
 
     <div class="setting">
       <label>
@@ -109,22 +81,43 @@
         <em>(Note: If "Default link behavior" is chosen for any settings above, this will still be the behavior)</em>
       </label>
     </div>
+
+    <div class="setting">
+      <label><span class="label-text">New tab appears at:</span>
+        <select name="tab">
+          <option id="start" value="start">Start of tab list</option>
+          <option id="end" value="end">End of tab list</option>
+          <option id="left" value="left">Left of current tab</option>
+          <option id="right" value="right">Right of current tab</option>
+        </select>
+      </label>
+    </div>
   
     <div id="status"></div>
     <input id="save" name="save" type="submit" value="Save" />
+  </form>
+
+  <hr />
+
+  <form id="sleepTimerForm" >
+    <div class="setting">
+        <label><span class="label-text">Suspend extension for:</span>
+          <select name="duration">
+            <option id="blank" value="0"></option>
+            <option id="five-minutes" value="300000">5 minutes</option>
+            <option id="fifteen-minutes" value="900000">15 minutes</option>
+            <option id="thirty-minutes" value="1800000">30 minutes</option>
+            <option id="one-hour" value="3600000">1 hour</option>
+          </select>
+
+          <input type="submit" name="sleep" value="Start" />
+          <button id="cancelSleeptimer">Cancel</button>
+          <span id="finalCountdown"></span>
+        </label>
+      </div> 
   </form>
 
   <script src="options.js"></script>
 </body>
 
 </html>
-
-<!-- Command Shortcut HTML
-<div class="extension-command-details">
-        <div class="command-container">
-          <span class="command-description">Toggle feature foo</span>
-          <span class="command-shortcut-container"><span class="command-shortcut clearable inactive-keybinding"><img class="command-clear" src="chrome://theme/IDR_EXTENSION_COMMAND_CLOSE" style="content: -webkit-image-set(url('chrome://theme/IDR_EXTENSION_COMMAND_CLOSE') 1x, url('chrome://theme/IDR_EXTENSION_COMMAND_CLOSE@2x') 2x);" id="clear-fkifcafjpcknpoflbjhamippgjofncii-toggle-feature-foo" title="Delete shortcut"><span class="command-shortcut-text" tabindex="0">Not set</span></span></span>
-          <select class="command-scope" id="setCommandScope-fkifcafjpcknpoflbjhamippgjofncii-toggle-feature-foo" disabled=""><option>In Chrome</option></select>
-        </div>
-      </div>
--->

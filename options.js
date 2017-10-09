@@ -90,11 +90,16 @@ function setSleepTimer(e) {
 
 function cancelSleepTimer(e) {
   e.preventDefault();
+  const finalCountdown = document.getElementById('finalCountdown');
 
   chrome.storage.sync.set({ expiration: 0 }, () => {
-    if (sleepTimerInterval) clearInterval(sleepTimerInterval);
-    const finalCountdown = document.getElementById('finalCountdown');
-    finalCountdown.textContent = '';
+    if (sleepTimerInterval) {
+      clearInterval(sleepTimerInterval);
+      finalCountdown.textContent = 'Resuming extension...';
+      setTimeout(() => {
+        finalCountdown.textContent = '';
+      }, 1000);
+    }
   });
 }
 
