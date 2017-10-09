@@ -4,6 +4,38 @@
   });
 }())
   .then((options) => {
+    const defaultOptions = {
+      key: 'command',
+      relative: 'same-tab',
+      absolute: 'new-tab',
+      tab: 'right',
+      expiration: 0,
+      whitelist: [],
+    };
+
+    options = Object.assign({}, defaultOptions, options);
+
+    function isWhitelisted(url) {
+      if (options.whitelist) {
+        for (let i = 0; i < options.whitelist.length; i += 1) {
+          if (url.indexOf(options.whitelist[i]) > -1) return true;
+        }
+      }
+
+      return false;
+    }
+
+    if (isWhitelisted(location.origin)) {
+      chrome.runtime.connect().postMessage({
+        type: 'WHITELISTED',
+        payload: {
+          options,
+        },
+      });
+
+      return;
+    }
+
     function openInSameTab() {
       return true;
     }
@@ -57,8 +89,6 @@
             // if there the sleep timer is running
             if (hasSleepTimer()) return;
 
-            // if the user is holding the cmd key or the href is a full path, load in the same window
-
             // ignore if middle or right click
             if (e.which > 1 && e.which < 4) return;
 
@@ -75,8 +105,6 @@
           return (e) => {
           // if there the sleep timer is running
             if (hasSleepTimer()) return;
-
-            // if the user is holding the cmd key or the href is a full path, load in the same window
 
             // ignore if middle or right click
             if (e.which > 1 && e.which < 4) return;
