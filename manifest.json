@@ -22,6 +22,11 @@
 	},
   "content_scripts": [
     {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["utils.js"],
+      "all_frames": true
+    },
+    {
       "matches": ["http://*.google.com/*", "https://*.google.com/*", "http://google.com/*", "https://google.com/*"],
       "js": ["strategies/google.js"],
       "all_frames": true

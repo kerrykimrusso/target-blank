@@ -3,12 +3,17 @@ window.strategy = (function init() {
     return true;
   };
 
-  const shouldIgnore = function shouldIgnore(a) {
-    return a.href.startsWith(window.origin);
+  const shouldIgnore = function shouldIgnore() {
+    return false
   };
+
+  const shouldTreatAsRelative = function shouldTreatAsRelative(a) {
+    return utils.isSubdomain(window.location.origin, a.origin);
+  }
 
   return {
     matchesDomain,
     shouldIgnore,
+    shouldTreatAsRelative
   };
 }());

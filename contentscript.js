@@ -46,10 +46,11 @@
       if (!href || href.startsWith('#') || href.startsWith('javascript') || !!anchor.onclick) return 'button';
 
       if (strategy &&
-        ('shouldTreatAsAbsolute' in strategy) &&
+        'shouldTreatAsAbsolute' in strategy &&
         strategy.shouldTreatAsAbsolute(anchor)) {
         return 'absolute';
-      } else if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`)) {
+      } else if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`) || 
+      (strategy && 'shouldTreatAsRelative' in strategy && strategy.shouldTreatAsRelative(anchor))) {
         return 'relative';
       }
       return 'absolute';
