@@ -15,6 +15,7 @@
 
     options = Object.assign({}, defaultOptions, options);
 
+<<<<<<< HEAD
     function isWhitelisted(url) {
       if (options.whitelist) {
         for (let i = 0; i < options.whitelist.length; i += 1) {
@@ -36,6 +37,8 @@
       return;
     }
 
+=======
+>>>>>>> add default options
     function openInSameTab() {
       return true;
     }
