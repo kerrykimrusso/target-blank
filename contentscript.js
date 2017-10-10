@@ -15,30 +15,6 @@
 
     options = Object.assign({}, defaultOptions, options);
 
-<<<<<<< HEAD
-    function isWhitelisted(url) {
-      if (options.whitelist) {
-        for (let i = 0; i < options.whitelist.length; i += 1) {
-          if (url.indexOf(options.whitelist[i]) > -1) return true;
-        }
-      }
-
-      return false;
-    }
-
-    if (isWhitelisted(location.origin)) {
-      chrome.runtime.connect().postMessage({
-        type: 'WHITELISTED',
-        payload: {
-          options,
-        },
-      });
-
-      return;
-    }
-
-=======
->>>>>>> add default options
     function openInSameTab() {
       return true;
     }
