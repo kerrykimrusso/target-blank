@@ -1,8 +1,10 @@
 {
     "extends": "airbnb-base",
     "env": {
-        "browser": true
+        "browser": true,
+        "mocha": true
     },
+    
     "rules": {
         "no-console": 0,
         "no-debugger": 0,
