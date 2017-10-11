@@ -1,19 +1,24 @@
-window.strategy = (function init() {
-  const matchesDomain = function matchesDomain() {
+window.strategy = (function init(utils, origin) {
+  function matchesDomain() {
     return true;
-  };
+  }
 
-  const shouldIgnore = function shouldIgnore() {
+  function shouldIgnore(anchor) {
     return false;
-  };
+  }
 
-  function shouldTreatAsAbsolute(a) {
-    return /\/raw\//i.test(a.href);
+  function shouldTreatAsRelative(anchor) {
+    return false;
+  }
+
+  function shouldTreatAsAbsolute(anchor) {
+    return /\/raw\//i.test(anchor.href);
   }
 
   return {
     matchesDomain,
     shouldIgnore,
+    shouldTreatAsRelative,
     shouldTreatAsAbsolute,
   };
-}());
+}(window.utils, window.location.origin));

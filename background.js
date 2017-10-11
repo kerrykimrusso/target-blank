@@ -1,5 +1,16 @@
 let tabCount = 0;
 
+const defaultOptions = {
+  key: 'command',
+  relative: 'same-tab',
+  absolute: 'new-tab',
+  tab: 'right',
+  expiration: 0,
+  whitelist: [],
+};
+
+options = Object.assign({}, defaultOptions, options);
+
 function getPosition(tabs, val) {
   switch (val) {
     case 'start':
@@ -15,7 +26,7 @@ function getPosition(tabs, val) {
 
 chrome.runtime.onConnect.addListener((port) => {
   const messageHandlers = {
-    NEW_TAB: (payload) => {
+    LINK_CLICKED: ({ anchorType, anchorUrl, windowOrigin }) => {
       chrome.tabs.query({
         active: true,
         currentWindow: true,
@@ -45,3 +56,59 @@ function getTabCount() {
 chrome.windows.onFocusChanged.addListener(getTabCount);
 chrome.tabs.onCreated.addListener(getTabCount);
 chrome.tabs.onRemoved.addListener(getTabCount);
+
+function tabOption(anchor, strategy) {
+  const type = anchorType(anchor, strategy);
+
+  switch (options[type]) {
+    case 'new-tab':
+      return (e) => {
+        // if there the sleep timer is running
+        if (hasSleepTimer()) return;
+
+        // ignore if middle or right click
+        if (e.which > 1 && e.which < 4) return;
+
+        if (shouldDoOpposite(e)) {
+          openInSameTab();
+        } else {
+          e.preventDefault();
+          openInNewTab(anchor.href);
+        }
+      };
+
+    case 'same-tab':
+      anchor.target = '';
+      return (e) => {
+      // if there the sleep timer is running
+        if (hasSleepTimer()) return;
+
+        // ignore if middle or right click
+        if (e.which > 1 && e.which < 4) return;
+
+        if (shouldDoOpposite(e)) {
+          e.preventDefault();
+          openInNewTab(anchor.href);
+        } else {
+          openInSameTab();
+        }
+      };
+
+    default:
+      return () => true;
+  }
+
+  function openInSameTab() {
+    return true;
+  }
+
+  function openInNewTab(href) {
+    chrome.runtime.connect().postMessage({
+      type: 'NEW_TAB',
+      payload: {
+        url: href,
+        options,
+      },
+    });
+  }
+}
