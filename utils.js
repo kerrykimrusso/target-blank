@@ -32,3 +32,5 @@ const utils = (function initUtils() {
     isSleepTimerEnabled,
   };
 }());
+
+module.exports = utils;
