@@ -3,11 +3,8 @@
   "version": "1.0.0",
   "description": "A Chrome extension that makes links open in a new tab/window by default.",
   "main": "background.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha tests/test.js"
+    "test": "mocha --recursive 'tests/**.spec.js'"
   },
   "repository": {
     "type": "git",
