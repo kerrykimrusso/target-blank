@@ -4,7 +4,8 @@
   "description": "A Chrome extension that makes links open in a new tab/window by default.",
   "main": "background.js",
   "scripts": {
-    "test": "mocha --reporter nyan --recursive 'tests/**.spec.js'"
+    "test": "mocha --reporter nyan --recursive 'tests/**.spec.js'",
+    "test:watch": "mocha --watch --reporter nyan --recursive 'tests/**.spec.js'"
   },
   "repository": {
     "type": "git",
