@@ -21,7 +21,7 @@ const utils = (function initUtils() {
 
   function shouldntAddListener(anchor) {
     const href = anchor.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('javascript') || !!anchor.onclick) return true;
+    if (!href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick) return true;
     return false;
   }
 
