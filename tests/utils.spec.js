@@ -1,4 +1,8 @@
+const factory = require('./factory');
 const utils = require('../utils.js');
+const yahooStrategy = require('../strategies/yahoo')(utils, 'yahoo.com');
+const googleStrategy = require('../strategies/google')(utils, 'google.com');
+const githubStrategy = require('../strategies/github')(utils, 'github.com');
 const chai = require('chai');
 
 const expect = chai.expect;
@@ -17,11 +21,8 @@ describe('Test util functions', () => {
   });
 
   describe('#shouldntAddListener', () => {
+    var anchor = factory.anchor();
 
-    var anchor = {
-      setAttribute: function(name, value) { this[name] = value },
-      getAttribute: function(name) { return this[name] }
-    }
     it('returns true for an empty href', () => {
       anchor.setAttribute('href', '');
       expect(utils.shouldntAddListener(anchor)).to.be.true;
@@ -51,15 +52,10 @@ describe('Test util functions', () => {
 
   describe('#determineAnchorType', () => {
 
-    var anchor = {
-      setAttribute: function(name, value) { this[name] = value },
-      getAttribute: function(name) { return this[name] }
-    }
+    var anchor = factory.anchor();
 
     describe('without a strategy', () => {
-
       anchor.setAttribute('origin', 'http://drive.google.com')
-
 
       it('returns "relative" if anchor.origin and windowOrigin match', () => {
         expect(utils.determineAnchorType(anchor, 'http://google.com')).to.eq('relative');
