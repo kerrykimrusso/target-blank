@@ -1,8 +1,4 @@
-window.strategy = (function init(utils, origin) {
-  function matchesDomain() {
-    return true;
-  }
-
+const strategy = (function init(utils, origin) {
   function shouldIgnore(anchor) {
     return false;
   }
@@ -16,9 +12,10 @@ window.strategy = (function init(utils, origin) {
   }
 
   return {
-    matchesDomain,
     shouldIgnore,
     shouldTreatAsRelative,
     shouldTreatAsAbsolute,
   };
-}(window.utils, window.location.origin));
+});
+
+if (module) module.exports = strategy;

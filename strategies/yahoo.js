@@ -1,14 +1,10 @@
-window.strategy = (function init(utils, origin) {
-  function matchesDomain() {
-    return true;
-  }
-
+const strategy = (function init(utils, origin) {
   function shouldIgnore() {
     return false;
   }
 
   function shouldTreatAsRelative(anchor) {
-    return utils.isSubdomain(origin, anchor.origin);
+    return utils.hasSameDomain(origin, anchor.origin);
   }
 
   function shouldTreatAsAbsolute() {
@@ -16,9 +12,10 @@ window.strategy = (function init(utils, origin) {
   }
 
   return {
-    matchesDomain,
     shouldIgnore,
     shouldTreatAsRelative,
     shouldTreatAsAbsolute,
   };
-}(window.utils, window.location.origin));
+});
+
+if (module) module.exports = strategy;
