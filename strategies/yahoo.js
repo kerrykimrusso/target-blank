@@ -18,4 +18,8 @@ const strategy = (function init(utils, origin) {
   };
 });
 
-if (module) module.exports = strategy;
+try {
+  module.exports = strategy;
+} catch (err) {
+  window.utils = strategy;
+}

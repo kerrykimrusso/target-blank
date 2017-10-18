@@ -33,4 +33,8 @@ const utils = (function initUtils() {
   };
 }());
 
-module.exports = utils;
+try {
+  module.exports = utils;
+} catch (err) {
+  window.utils = utils;
+}
