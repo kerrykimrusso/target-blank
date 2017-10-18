@@ -6,15 +6,28 @@
       if (shouldntAddListener(a)) return;
 
       a.addEventListener('click', (e) => {
+        // TODO check for sleep timer
+
+        // ignore if middle or right click
+        if (e.which > 1 && e.which < 4) return;
+
         e.preventDefault();
+        e.stopImmediatePropagation();
+
         const origin = window.location.origin;
-        chrome.runtime.connect().postMessage({
+
+        let keyPressed = '';
+        if (e.metaKey) keyPressed = 'command';
+        else if (e.altKey) keyPressed = 'alt';
+
+        chrome.runtime.sendMessage({
           type: 'LINK_CLICKED',
-          anchorType: determineAnchorType(a, origin, strategy),
-          anchorUrl: a.getAttribute('href'),
-          windowOrigin: origin,
+          payload: {
+            anchorType: determineAnchorType(a, origin, strategy),
+            anchorUrl: a.getAttribute('href'),
+            keyPressed,
+          },
         });
-        return false;
       });
     });
   }

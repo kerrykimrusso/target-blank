@@ -49,7 +49,7 @@
         'shouldTreatAsAbsolute' in strategy &&
         strategy.shouldTreatAsAbsolute(anchor)) {
         return 'absolute';
-      } else if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`) || 
+      } else if (fullPath.startsWith(`http://${window.location.host}`) || fullPath.startsWith(`https://${window.location.host}`) ||
       (strategy && 'shouldTreatAsRelative' in strategy && strategy.shouldTreatAsRelative(anchor))) {
         return 'relative';
       }
@@ -128,54 +128,118 @@
   });
 
 
+let tabCount = 0;
+
+function getPosition(tabs, val) {
+  switch (val) {
+    case 'start':
+      return 0;
+    case 'end':
+      return tabCount;
+    case 'left':
+      return tabs[0].index;
+    default: // 'right'
+      return tabs[0].index + 1;
+  }
+}
+
+chrome.runtime.onConnect.addListener((port) => {
+  const messageHandlers = {
+    NEW_TAB: (payload) => {
+      chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      }, (tabs) => {
+        chrome.tabs.create({
+          url: payload.url,
+          active: true,
+          index: getPosition(tabs, payload.options.tab),
+        });
+      });
+    },
+  };
+
+  port.onMessage.addListener((info) => {
+    messageHandlers[info.type](info.payload);
+  });
+});
+
+function getTabCount() {
+  chrome.tabs.query({
+    currentWindow: true,
+  }, (tabs) => {
+    tabCount = tabs.length;
+  });
+}
+
+chrome.windows.onFocusChanged.addListener(getTabCount);
+chrome.tabs.onCreated.addListener(getTabCount);
+chrome.tabs.onRemoved.addListener(getTabCount);
 
 
+/**
+   * OPTIONS.JS
+   */
 
-  let tabCount = 0;
-  
-  function getPosition(tabs, val) {
-    switch (val) {
-      case 'start':
-        return 0;
-      case 'end':
-        return tabCount;
-      case 'left':
-        return tabs[0].index;
-      default: // 'right'
-        return tabs[0].index + 1;
+let sleepTimerInterval;
+
+function formatFinalCountdown(timeRemaining) {
+  const hours = Math.floor(timeRemaining / 3600000);
+  const minutes = Math.floor((timeRemaining % 3600000) / 60000);
+  const seconds = Math.floor((timeRemaining % 60000) / 1000);
+
+  const padStart = String.prototype.padStart;
+
+  let formatted = hours > 0 ? `${hours}:` : '';
+  formatted += hours > 0 || minutes > 0 ? `${padStart.call(minutes, 2, '0')}:` : '';
+  formatted += hours > 0 || minutes > 0 || seconds > 0 ? `${padStart.call(seconds, 2, '0')}` : '';
+  return formatted;
+}
+
+
+function initFinalCountdown(expiration) {
+  function onSleepTimerInterval() {
+    const timeRemaining = expiration - Date.now();
+    if (timeRemaining <= 0) {
+      clearInterval(sleepTimerInterval);
+    } else {
+      const finalCountdown = document.getElementById('finalCountdown');
+      finalCountdown.textContent = formatFinalCountdown(timeRemaining);
     }
   }
-  
-  chrome.runtime.onConnect.addListener((port) => {
-    const messageHandlers = {
-      NEW_TAB: (payload) => {
-        chrome.tabs.query({
-          active: true,
-          currentWindow: true,
-        }, (tabs) => {
-          chrome.tabs.create({
-            url: payload.url,
-            active: true,
-            index: getPosition(tabs, payload.options.tab),
-          });
-        });
-      },
-    };
-  
-    port.onMessage.addListener((info) => {
-      messageHandlers[info.type](info.payload);
-    });
+
+  sleepTimerInterval = setInterval(onSleepTimerInterval, 1000);
+  onSleepTimerInterval();
+}
+
+
+function setSleepTimer(e) {
+  e.preventDefault();
+
+  if (sleepTimerInterval) clearInterval(sleepTimerInterval);
+
+  const duration = parseInt(e.target.duration.value, 10);
+  const expiration = Date.now() + duration;
+
+  chrome.storage.sync.set({ expiration }, () => {
+    initFinalCountdown(expiration);
   });
-  
-  function getTabCount() {
-    chrome.tabs.query({
-      currentWindow: true,
-    }, (tabs) => {
-      tabCount = tabs.length;
-    });
-  }
-  
-  chrome.windows.onFocusChanged.addListener(getTabCount);
-  chrome.tabs.onCreated.addListener(getTabCount);
-  chrome.tabs.onRemoved.addListener(getTabCount);
-  
+}
+
+function cancelSleepTimer(e) {
+  e.preventDefault();
+  const finalCountdown = document.getElementById('finalCountdown');
+
+  chrome.storage.sync.set({ expiration: 0 }, () => {
+    if (sleepTimerInterval) {
+      clearInterval(sleepTimerInterval);
+      finalCountdown.textContent = 'Resuming extension...';
+      setTimeout(() => {
+        finalCountdown.textContent = '';
+      }, 1000);
+    }
+  });
+}
+
+document.getElementById('sleepTimerForm').addEventListener('submit', setSleepTimer);
+document.getElementById('cancelSleeptimer').addEventListener('click', cancelSleepTimer);

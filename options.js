@@ -1,109 +1,48 @@
-let sleepTimerInterval;
+document.addEventListener('DOMContentLoaded', () => {
+  function saveOptions(e) {
+    e.preventDefault();
 
-function formatFinalCountdown(timeRemaining) {
-  const hours = Math.floor(timeRemaining / 3600000);
-  const minutes = Math.floor((timeRemaining % 3600000) / 60000);
-  const seconds = Math.floor((timeRemaining % 60000) / 1000);
-
-  const padStart = String.prototype.padStart;
-
-  let formatted = hours > 0 ? `${hours}:` : '';
-  formatted += hours > 0 || minutes > 0 ? `${padStart.call(minutes, 2, '0')}:` : '';
-  formatted += hours > 0 || minutes > 0 || seconds > 0 ? `${padStart.call(seconds, 2, '0')}` : '';
-  return formatted;
-}
-
-
-function initFinalCountdown(expiration) {
-  function onSleepTimerInterval() {
-    const timeRemaining = expiration - Date.now();
-    if (timeRemaining <= 0) {
-      clearInterval(sleepTimerInterval);
-    } else {
-      const finalCountdown = document.getElementById('finalCountdown');
-      finalCountdown.textContent = formatFinalCountdown(timeRemaining);
+    const options = {};
+    const form = e.target;
+    // subtract 1 from form length so we do not iterate over save button
+    for (let i = 0, el; i < form.length - 1; i += 1) {
+      el = form[i];
+      options[el.name] = el.value;
     }
+
+    chrome.runtime.sendMessage({
+      type: 'SAVE_OPTIONS_BTN_CLICKED',
+      payload: options,
+    });
   }
 
-  sleepTimerInterval = setInterval(onSleepTimerInterval, 1000);
-  onSleepTimerInterval();
-}
-
-// Saves options to chrome.storage.sync.
-function saveOptions(e) {
-  e.preventDefault();
-
-  const newOptions = {};
-
-  const form = e.target;
-  // subtract 1 from form length so we do not iterate over save button
-  for (let i = 0, el; i < form.length - 1; i += 1) {
-    el = form[i];
-    newOptions[el.name] = el.value;
+  function restoreOptionsForm(options) {
+    // looping over keys works for now if we're sticking to all dropdown lists
+    Object.keys(options).forEach((key) => {
+      const el = document.querySelector(`select[name=${key}]`);
+      if (el) el.namedItem(options[key]).setAttribute('selected', true);
+    });
   }
 
-  chrome.storage.sync.set(newOptions, () => {
-    // Update status to let user know options were saved.
+  function onOptionsSaved() {
     const status = document.getElementById('status');
     status.textContent = 'Options saved.';
     setTimeout(() => {
       status.textContent = '';
     }, 750);
-  });
-}
+  }
 
-// Restores select box and checkbox state using the preferences
-// stored in chrome.storage.
-function restoreOptions() {
-  const defaultOptions = {
-    key: 'command',
-    relative: 'same-tab',
-    absolute: 'new-tab',
-    tab: 'right',
-    expiration: 0,
-  };
+  chrome.storage.sync.get(null, (options) => {
+    restoreOptionsForm(options);
 
-  chrome.storage.sync.get(defaultOptions, (curOptions) => {
-    // update options.html
-    // looping over keys works for now if we're sticking to all dropdown lists
-    Object.keys(curOptions).forEach((key) => {
-      const el = document.querySelector(`select[name=${key}]`);
-      if (el) el.namedItem(curOptions[key]).setAttribute('selected', true);
+    chrome.runtime.onMessage.addListener((msg) => {
+      const messageHandlers = {
+        OPTIONS_SAVED: onOptionsSaved,
+      };
+
+      messageHandlers[msg.type](msg.payload);
     });
 
-    initFinalCountdown(curOptions.expiration);
+    document.getElementById('optionsForm').addEventListener('submit', saveOptions);
   });
-}
-
-function setSleepTimer(e) {
-  e.preventDefault();
-
-  if (sleepTimerInterval) clearInterval(sleepTimerInterval);
-
-  const duration = parseInt(e.target.duration.value, 10);
-  const expiration = Date.now() + duration;
-
-  chrome.storage.sync.set({ expiration }, () => {
-    initFinalCountdown(expiration);
-  });
-}
-
-function cancelSleepTimer(e) {
-  e.preventDefault();
-  const finalCountdown = document.getElementById('finalCountdown');
-
-  chrome.storage.sync.set({ expiration: 0 }, () => {
-    if (sleepTimerInterval) {
-      clearInterval(sleepTimerInterval);
-      finalCountdown.textContent = 'Resuming extension...';
-      setTimeout(() => {
-        finalCountdown.textContent = '';
-      }, 1000);
-    }
-  });
-}
-
-document.addEventListener('DOMContentLoaded', restoreOptions);
-document.getElementById('optionsForm').addEventListener('submit', saveOptions);
-document.getElementById('sleepTimerForm').addEventListener('submit', setSleepTimer);
-document.getElementById('cancelSleeptimer').addEventListener('click', cancelSleepTimer);
+});

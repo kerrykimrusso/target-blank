@@ -1,6 +1,4 @@
-let tabCount = 0;
-
-const defaultOptions = {
+let options = {
   key: 'command',
   relative: 'same-tab',
   absolute: 'new-tab',
@@ -9,106 +7,80 @@ const defaultOptions = {
   whitelist: [],
 };
 
-options = Object.assign({}, defaultOptions, options);
+// Saves options to chrome.storage.sync.
+function saveOptions(newOptions, sendResponse) {
+  chrome.storage.sync.set(newOptions, () => {
+    options = Object.assign({}, options, newOptions);
 
-function getPosition(tabs, val) {
+    sendResponse({
+      type: 'OPTIONS_SAVED',
+      payload: newOptions,
+    });
+  });
+}
+
+function restoreOptions() {
+  chrome.storage.sync.get(null, (curOptions) => {
+    options = Object.assign({}, options, curOptions);
+  });
+}
+
+function getNewTabIndex(tab, val) {
   switch (val) {
     case 'start':
       return 0;
     case 'end':
-      return tabCount;
+      return Number.MAX_SAFE_INTEGER;
     case 'left':
-      return tabs[0].index;
+      return tab.index;
     default: // 'right'
-      return tabs[0].index + 1;
+      return tab.index + 1;
   }
 }
 
-chrome.runtime.onConnect.addListener((port) => {
-  const messageHandlers = {
-    LINK_CLICKED: ({ anchorType, anchorUrl, windowOrigin }) => {
-      chrome.tabs.query({
-        active: true,
-        currentWindow: true,
-      }, (tabs) => {
-        chrome.tabs.create({
-          url: payload.url,
-          active: true,
-          index: getPosition(tabs, payload.options.tab),
-        });
-      });
-    },
-  };
-
-  port.onMessage.addListener((info) => {
-    messageHandlers[info.type](info.payload);
+function openInSameTab(url) {
+  chrome.tabs.update({
+    url,
   });
-});
+}
 
-function getTabCount() {
+function openInNewTab(url) {
   chrome.tabs.query({
+    active: true,
     currentWindow: true,
   }, (tabs) => {
-    tabCount = tabs.length;
+    chrome.tabs.create({
+      url,
+      active: true,
+      index: getNewTabIndex(tabs[0], options.tab),
+    });
   });
 }
 
-chrome.windows.onFocusChanged.addListener(getTabCount);
-chrome.tabs.onCreated.addListener(getTabCount);
-chrome.tabs.onRemoved.addListener(getTabCount);
+function onLinkClicked({ anchorType, anchorUrl, keyPressed }) {
+  const shouldDoOpposite = window.utils.shouldDoOppositeTabAction(keyPressed, options.key);
 
-function tabOption(anchor, strategy) {
-  const type = anchorType(anchor, strategy);
-
-  switch (options[type]) {
-    case 'new-tab':
-      return (e) => {
-        // if there the sleep timer is running
-        if (hasSleepTimer()) return;
-
-        // ignore if middle or right click
-        if (e.which > 1 && e.which < 4) return;
-
-        if (shouldDoOpposite(e)) {
-          openInSameTab();
-        } else {
-          e.preventDefault();
-          openInNewTab(anchor.href);
-        }
-      };
-
+  switch (options[anchorType]) {
     case 'same-tab':
-      anchor.target = '';
-      return (e) => {
-      // if there the sleep timer is running
-        if (hasSleepTimer()) return;
-
-        // ignore if middle or right click
-        if (e.which > 1 && e.which < 4) return;
-
-        if (shouldDoOpposite(e)) {
-          e.preventDefault();
-          openInNewTab(anchor.href);
-        } else {
-          openInSameTab();
-        }
-      };
-
-    default:
-      return () => true;
-  }
-
-  function openInSameTab() {
-    return true;
-  }
-
-  function openInNewTab(href) {
-    chrome.runtime.connect().postMessage({
-      type: 'NEW_TAB',
-      payload: {
-        url: href,
-        options,
-      },
-    });
+      if (shouldDoOpposite) openInNewTab(anchorUrl);
+      else openInSameTab(anchorUrl);
+      break;
+    case 'new-tab':
+      if (shouldDoOpposite) openInSameTab(anchorUrl);
+      else openInNewTab(anchorUrl);
+      break;
+    default: break;
   }
 }
+
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // map message type to handler
+  const messageHandlers = {
+    LINK_CLICKED: onLinkClicked,
+    SAVE_OPTIONS_BTN_CLICKED: saveOptions,
+  };
+
+  messageHandlers[msg.type](msg.payload, sendResponse);
+});
+
+restoreOptions();
