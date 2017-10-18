@@ -4,6 +4,10 @@
 <head>
   <title>Target Blank Extension Options</title>
   <style>
+    * { 
+      box-sizing: border-box;
+    }
+
     body {
       padding: .5em;
       width: 20rem;
@@ -26,23 +30,21 @@
 
     select {
       display: block;
-      width: 75%;
+      width: 100%;
       margin-bottom:.25em;
     }
 
     #status {
       color: #2edb5c;
-      bottom: 1em;
       font-weight: bold;
       padding: .5em;
-      position: absolute;
       width: 84%;
       text-align: center;
     }
 
     #save {
       display: block;
-      margin: 2em auto 2em auto;
+      margin: 0 auto 2em auto;
     }
   </style>
 </head>
@@ -56,7 +58,6 @@
         <select name="relative">
           <option id="same-tab" value="same-tab">Current tab</option>
           <option id="new-tab" value="new-tab">New tab</option>
-          <option id="ignore" value="ignore">Default link behavior</option>
         </select>
       </label>
     </div> 
@@ -66,7 +67,6 @@
         <select name="absolute">
           <option id="new-tab" value="new-tab">New tab</option>
           <option id="same-tab" value="same-tab">Current tab</option>
-          <option id="ignore" value="ignore">Default link behavior</option>
         </select>
       </label>
     </div>
