@@ -3,12 +3,12 @@ const strategy = (function init(utils, origin) {
     return /^Google (apps|Account)/.test(anchor.title);
   }
 
-  function shouldTreatAsRelative(anchor) {
+  function shouldTreatAsRelative() {
     return false;
   }
 
-  function shouldTreatAsAbsolute() {
-    return false;
+  function shouldTreatAsAbsolute(anchor) {
+    return /^https*:\/\/www\.google\.com\/url\?/.test(anchor.href);
   }
 
   return {
