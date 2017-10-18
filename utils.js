@@ -25,11 +25,16 @@ const utils = (function initUtils() {
     return false;
   }
 
+  function shouldDoOppositeTabAction(keyPressed, oppositeKey) {
+    return keyPressed === oppositeKey;
+  }
+
   return {
     hasSameDomain,
     shouldntAddListener,
     determineAnchorType,
     isSleepTimerEnabled,
+    shouldDoOppositeTabAction,
   };
 }());
 
