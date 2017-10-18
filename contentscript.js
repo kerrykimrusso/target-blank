@@ -1,4 +1,4 @@
-(function init(utils, strategy) {
+(function init(utils, strategy, location) {
   const { shouldntAddListener, determineAnchorType } = utils;
 
   function addClickListener(anchorTags) {
@@ -14,7 +14,7 @@
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        const origin = window.location.origin;
+        const origin = location.origin;
 
         let keyPressed = '';
         if (e.metaKey) keyPressed = 'command';
@@ -43,4 +43,4 @@
 
   const anchors = document.querySelectorAll('a');
   addClickListener(anchors);
-}(window.utils, window.strategy));
+}(window.utils, window.strategy, window.location));
