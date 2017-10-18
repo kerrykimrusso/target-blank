@@ -24,7 +24,7 @@
           type: 'LINK_CLICKED',
           payload: {
             anchorType: determineAnchorType(a, origin, strategy),
-            anchorUrl: a.getAttribute('href'),
+            anchorUrl: a.href,
             keyPressed,
           },
         });
