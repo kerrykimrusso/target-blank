@@ -21,5 +21,5 @@ const strategy = (function init(utils, origin) {
 try {
   module.exports = strategy;
 } catch (err) {
-  window.utils = strategy;
+  window.strategy = strategy(window.utils, window.origin);
 }
