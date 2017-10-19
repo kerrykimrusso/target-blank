@@ -84,4 +84,28 @@ describe('Test util functions', () => {
       expect(utils.shouldDoOppositeTabAction('command', 'alt')).to.be.false;
     })
   });
+
+  describe('#keyHeldDuringClick', () => {
+    let event;
+    beforeEach(() => {
+      event = factory.event();
+    });
+
+    it('should return "command" if event.metaKey is true', () => {
+      event.metaKey = true;
+      expect(utils.keyHeldDuringClick(event)).to.equal('command');
+    })
+    it('should return "alt" if event.altKey is true', () => {
+      event.altKey = true;
+      expect(utils.keyHeldDuringClick(event)).to.equal('alt');
+    })
+    it('should return an empty string otherwise', () => {
+      expect(utils.keyHeldDuringClick(event)).to.equal('');
+    })
+    it('should return an empty string if both event.metaKey and event.altKey are true', () => {
+      event.metaKey = true;
+      event.altKey = true;
+      expect(utils.keyHeldDuringClick(event)).to.equal('');
+    })
+  });
 });

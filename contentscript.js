@@ -1,12 +1,11 @@
 (function init(utils, strategy, location) {
-  const { shouldntAddListener, determineAnchorType } = utils;
-
   function addClickListener(anchorTags) {
     anchorTags.forEach((a) => {
-      if (shouldntAddListener(a)) return;
+      if (utils.shouldntAddListener(a)) return;
 
       a.addEventListener('click', (e) => {
         // TODO check for sleep timer
+        // if(utils.isSleepTimerEnabled(, Date.now())) return;
 
         // ignore if middle or right click
         if (e.which > 1 && e.which < 4) return;
@@ -16,16 +15,12 @@
 
         const origin = location.origin;
 
-        let keyPressed = '';
-        if (e.metaKey) keyPressed = 'command';
-        else if (e.altKey) keyPressed = 'alt';
-
         chrome.runtime.sendMessage({
           type: 'LINK_CLICKED',
           payload: {
-            anchorType: determineAnchorType(a, origin, strategy),
+            anchorType: utils.determineAnchorType(a, origin, strategy),
             anchorUrl: a.href,
-            keyPressed,
+            keyPressed: utils.keyHeldDuringClick(e),
           },
         });
       });

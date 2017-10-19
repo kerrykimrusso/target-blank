@@ -29,12 +29,20 @@ const utils = (function initUtils() {
     return keyPressed === oppositeKey;
   }
 
+  function keyHeldDuringClick(event) {
+    if (event.metaKey && !event.altKey) return 'command';
+    if (event.altKey && !event.metaKey) return 'alt';
+
+    return '';
+  }
+
   return {
     hasSameDomain,
     shouldntAddListener,
     determineAnchorType,
     isSleepTimerEnabled,
     shouldDoOppositeTabAction,
+    keyHeldDuringClick,
   };
 }());
 
