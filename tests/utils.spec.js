@@ -4,8 +4,10 @@ const yahooStrategy = require('../strategies/yahoo')(utils, 'yahoo.com');
 const googleStrategy = require('../strategies/google')(utils, 'google.com');
 const githubStrategy = require('../strategies/github')(utils, 'github.com');
 const chai = require('chai');
-
+const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
 const expect = chai.expect;
+chai.use(sinonChai);
 
 describe('Test util functions', () => {
   describe('#hasSameDomain', () => {
@@ -52,9 +54,9 @@ describe('Test util functions', () => {
 
   describe('#determineAnchorType', () => {
     var anchor = factory.anchor();
+    anchor.setAttribute('origin', 'http://drive.google.com')
 
     describe('without a strategy', () => {
-      anchor.setAttribute('origin', 'http://drive.google.com')
 
       it('returns "relative" if anchor.origin and windowOrigin match', () => {
         expect(utils.determineAnchorType(anchor, 'http://google.com')).to.eq('relative');
@@ -65,11 +67,30 @@ describe('Test util functions', () => {
     });
 
     describe('with a strategy', () => {
+      it('returns "absolute" if strategy.shouldTreatAsAbsolute()', () => {
+        let strategy = factory.strategy(false, true);
+        expect(utils.determineAnchorType(anchor, 'http://google.com', strategy)).to.eq('absolute')
+      });
+      it('returns "relative" if strategy.shouldTreatAsRelative()', () => {
+        let strategy = factory.strategy(true, false);
+        expect(utils.determineAnchorType(anchor, 'http://google.com', strategy)).to.eq('relative')
+      });
+      it('returns "absolute" if both strategy.shouldTreatAsAbsolute() && strategy.shouldTreatAsRelative() are true', () => {
+        let strategy = factory.strategy(true, true);
+        expect(utils.determineAnchorType(anchor, 'http://google.com', strategy)).to.eq('absolute')
+      });
+      it('calls hasSameDomain() if both strategy.shouldTreatAsAbsolute() && strategy.shouldTreatAsRelative() are false', () => {
+        let strategy = factory.strategy(false, false);
+        let hasSameDomain = sinon.spy(utils, 'hasSameDomain');
 
+        utils.determineAnchorType(anchor, 'http://google.com', strategy);
+        expect(hasSameDomain).to.have.been.called;
+        hasSameDomain.restore();
+      });
     });
   });
 
-  describe.only('#isSleepTimerEnabled(expirationTimeInMs, curTimerInMs)', () => {
+  describe('#isSleepTimerEnabled(expirationTimeInMs, curTimerInMs)', () => {
     it('should return true if expirationTimeInMs > curTimerInMs', () => {
       expect(utils.isSleepTimerEnabled(Date.now() + 30, Date.now())).to.be.true;
     })

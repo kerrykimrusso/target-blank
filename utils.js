@@ -15,7 +15,7 @@ const utils = (function initUtils() {
       if (strategy.shouldTreatAsAbsolute(anchor)) return 'absolute';
       if (strategy.shouldTreatAsRelative(anchor)) return 'relative';
     }
-    if (hasSameDomain(anchor.origin, windowOrigin)) return 'relative';
+    if (this.hasSameDomain(anchor.origin, windowOrigin)) return 'relative';
     return 'absolute';
   }
 
