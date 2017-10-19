@@ -67,10 +67,10 @@ const background = (function init(utils) {
         else openInSameTab(anchorUrl);
         break;
       case 'new-tab':
+      default:
         if (shouldDoOpposite) openInSameTab(anchorUrl);
         else openInNewTab(anchorUrl);
         break;
-      default: break;
     }
   }
 
