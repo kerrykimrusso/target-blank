@@ -51,7 +51,6 @@ describe('Test util functions', () => {
   });
 
   describe('#determineAnchorType', () => {
-
     var anchor = factory.anchor();
 
     describe('without a strategy', () => {
@@ -70,10 +69,16 @@ describe('Test util functions', () => {
     });
   });
 
-  describe('#isSleepTimerEnabled', () => {
-    xit('', () => {})
-    xit('', () => {})
-    xit('', () => {})
+  describe.only('#isSleepTimerEnabled(expirationTimeInMs, curTimerInMs)', () => {
+    it('should return true if expirationTimeInMs > curTimerInMs', () => {
+      expect(utils.isSleepTimerEnabled(Date.now() + 30, Date.now())).to.be.true;
+    })
+    it('should return false if expirationTimeInMs == curTimerInMs', () => {
+      expect(utils.isSleepTimerEnabled(Date.now(), Date.now())).to.be.false;
+    })
+    it('should return false if expirationTimeInMs < curTimerInMs', () => {
+      expect(utils.isSleepTimerEnabled(Date.now() - 30, Date.now())).to.be.false;
+    })
   });
 
   describe('#shouldDoOppositeTabAction(keyPressed, oppositeKey)', () => {
