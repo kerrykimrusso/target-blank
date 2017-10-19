@@ -50,8 +50,14 @@ describe('Strategies', () => {
       })
     })
     describe('#shouldTreatAsAbsolute', () => {
-      it('should return false', () => {
-        expect(googleStrategy.shouldTreatAsAbsolute()).to.be.false;
+      it('should return true if url starts with http(s)*://www.google.com/url?', () => {
+        anchor.setAttribute('href', 'https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=12&cad=rja&uact=8&ved=0ahUKEwiCnKHHl_vWAhUFySYKHVlPAwoQFgiPATAL&url=http%3A%2F%2Fwww.nbcsports.com%2Fphiladelphia%2Fflyers&usg=AOvVaw1I9rW2y-rz3zMuAgNxH0Gu');
+        expect(googleStrategy.shouldTreatAsAbsolute(anchor)).to.be.true;
+      })
+      
+      it('should return false if url does not start with http(s)*://www.google.com/url?', () => {
+        anchor.setAttribute('href', 'https://www.nhl.com/');
+        expect(googleStrategy.shouldTreatAsAbsolute(anchor)).to.be.false;
       })
     })
   })
