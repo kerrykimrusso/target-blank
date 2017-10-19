@@ -74,11 +74,25 @@ const background = (function init(utils) {
     }
   }
 
+  // TODO: incomplete
+  function setSleepTimer(duration) {
+
+    const expiration = Date.now() + duration;
+
+    chrome.storage.sync.set({ expiration }, () => {
+      chrome.runtime.sendMessage({
+        type: 'SLEEP_TIMER_SET',
+        payload: expiration,
+      });
+    });
+  }
+
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // map message type to handler
     const messageHandlers = {
       LINK_CLICKED: onLinkClicked,
       SAVE_OPTIONS_BTN_CLICKED: saveOptions,
+      SET_SLEEP_TIMER: setSleepTimer,
     };
 
     messageHandlers[msg.type](msg.payload, sendResponse);

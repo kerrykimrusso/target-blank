@@ -32,6 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 750);
   }
 
+  function setSleepTimer() {
+
+    const duration = document.getElementById('sleepTimerForm').duration.value;
+
+    chrome.runtime.sendMessage({
+      type: 'SET_SLEEP_TIMER',
+      payload: duration,
+    });
+  }
+
   chrome.storage.sync.get(null, (options) => {
     restoreOptionsForm(options);
 
@@ -44,5 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('optionsForm').addEventListener('submit', saveOptions);
+    document.getElementById('sleepTimerForm').addEventListener('submit', setSleepTimer);
   });
 });

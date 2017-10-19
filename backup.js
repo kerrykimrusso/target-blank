@@ -226,6 +226,7 @@ function setSleepTimer(e) {
   });
 }
 
+
 function cancelSleepTimer(e) {
   e.preventDefault();
   const finalCountdown = document.getElementById('finalCountdown');
