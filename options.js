@@ -25,18 +25,22 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function onOptionsSaved() {
-    const status = document.getElementById('status');
-    status.textContent = 'Options saved.';
-    setTimeout(() => {
-      status.textContent = '';
-    }, 750);
+    // const status = document.getElementById('status');
+    // status.textContent = 'Options saved.';
+    // setTimeout(() => {
+    //   status.textContent = '';
+    // }, 750);
   }
 
-  function setSleepTimer(e) {
-    e.preventDefault();
+  function onSleepTimerSet(expirationTimeInMs) {
+    const status = document.querySelector('#sleepToggleForm .status');
+    const expirationDate = new Date(expirationTimeInMs);
+    const timeMatches = expirationDate.toLocaleTimeString().match(/(\d+.\d+).\d+(\s+\w+)*/i);
+    const [, time, meridiem] = timeMatches;
+    status.textContent = `Will wake up at ${time}${meridiem || ''} tomorrow`;
+  }
 
-    const duration = document.getElementById('sleepTimerForm').duration.value;
-
+  function setSleepTimer(duration = 0) {
     chrome.runtime.sendMessage({
       type: 'SET_SLEEP_TIMER',
       payload: duration,
@@ -49,12 +53,27 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.runtime.onMessage.addListener((msg) => {
       const messageHandlers = {
         OPTIONS_SAVED: onOptionsSaved,
+        SLEEP_TIMER_SET: onSleepTimerSet,
       };
 
       messageHandlers[msg.type](msg.payload);
     });
 
     document.getElementById('optionsForm').addEventListener('change', saveOptions);
-    document.getElementById('sleepTimerForm').addEventListener('submit', setSleepTimer);
+    document.getElementById('sleepTimerForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      setSleepTimer(e.target.duration.value);
+    });
+    document.querySelector('#sleepToggleForm').toggle.addEventListener('change', (e) => {
+      e.preventDefault();
+
+      if (e.target.checked) {
+        const today = new Date();
+        const expirationDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 2, 0, 0);
+        setSleepTimer(expirationDate - today);
+      } else {
+        setSleepTimer();
+      }
+    });
   });
 });
