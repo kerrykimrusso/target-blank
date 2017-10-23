@@ -1,6 +1,5 @@
 const background = (function init(utils) {
   let options = {
-    key: 'command',
     relative: 'same-tab',
     absolute: 'new-tab',
     tab: 'right',
@@ -58,25 +57,20 @@ const background = (function init(utils) {
     });
   }
 
-  function onLinkClicked({ anchorType, anchorUrl, keyPressed }) {
-    const shouldDoOpposite = utils.shouldDoOppositeTabAction(keyPressed, options.key);
-
+  function onLinkClicked({ anchorType, anchorUrl }) {
     switch (options[anchorType]) {
       case 'same-tab':
-        if (shouldDoOpposite) openInNewTab(anchorUrl);
-        else openInSameTab(anchorUrl);
+        openInSameTab(anchorUrl);
         break;
       case 'new-tab':
       default:
-        if (shouldDoOpposite) openInSameTab(anchorUrl);
-        else openInNewTab(anchorUrl);
+        openInNewTab(anchorUrl);
         break;
     }
   }
 
   // TODO: incomplete
   function setSleepTimer(duration) {
-
     const expiration = Date.now() + duration;
 
     chrome.storage.sync.set({ expiration }, () => {

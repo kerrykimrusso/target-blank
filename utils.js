@@ -24,10 +24,6 @@ const utils = (function initUtils() {
     return !href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick || (!!strategy && strategy.shouldIgnore(anchor));
   }
 
-  function shouldDoOppositeTabAction(keyPressed, oppositeKey) {
-    return keyPressed === oppositeKey;
-  }
-
   function keyHeldDuringClick(event) {
     if (event.metaKey && !event.altKey) return 'command';
     if (event.altKey && !event.metaKey) return 'alt';
@@ -40,7 +36,6 @@ const utils = (function initUtils() {
     shouldIgnore,
     determineAnchorType,
     isSleepTimerEnabled,
-    shouldDoOppositeTabAction,
     keyHeldDuringClick,
   };
 }());

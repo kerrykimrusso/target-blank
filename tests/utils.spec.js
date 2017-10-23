@@ -124,15 +124,6 @@ describe('Test util functions', () => {
     })
   });
 
-  describe('#shouldDoOppositeTabAction(keyPressed, oppositeKey)', () => {
-    it('should return true if keyPressed and oppositeKey are equal', () => {
-      expect(utils.shouldDoOppositeTabAction('command', 'command')).to.be.true;
-    })
-    it('should return false if keyPressed and oppositeKey are not equal', () => {
-      expect(utils.shouldDoOppositeTabAction('command', 'alt')).to.be.false;
-    })
-  });
-
   describe('#keyHeldDuringClick', () => {
     let event;
     beforeEach(() => {

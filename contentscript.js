@@ -20,7 +20,6 @@
           payload: {
             anchorType: utils.determineAnchorType(a, origin, strategy),
             anchorUrl: a.href,
-            keyPressed: utils.keyHeldDuringClick(e),
           },
         });
       });
