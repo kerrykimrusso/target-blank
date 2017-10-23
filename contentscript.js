@@ -9,6 +9,7 @@
 
         // ignore if middle or right click
         if (e.which > 1 && e.which < 4) return;
+        if (utils.keyHeldDuringClick(e)) return;
 
         e.preventDefault();
         e.stopImmediatePropagation();

@@ -28,7 +28,7 @@ const utils = (function initUtils() {
     if (event.metaKey && !event.altKey) return 'command';
     if (event.altKey && !event.metaKey) return 'alt';
 
-    return '';
+    return null;
   }
 
   return {
