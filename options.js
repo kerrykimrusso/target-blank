@@ -3,9 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
 
     const options = {};
-    const form = e.target;
+    const form = e.currentTarget;
     // subtract 1 from form length so we do not iterate over save button
-    for (let i = 0, el; i < form.length - 1; i += 1) {
+    for (let i = 0, el; i < form.length; i += 1) {
       el = form[i];
       options[el.name] = el.value;
     }
@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 750);
   }
 
-  function setSleepTimer() {
+  function setSleepTimer(e) {
+    e.preventDefault();
 
     const duration = document.getElementById('sleepTimerForm').duration.value;
 
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       messageHandlers[msg.type](msg.payload);
     });
 
-    document.getElementById('optionsForm').addEventListener('submit', saveOptions);
+    document.getElementById('optionsForm').addEventListener('change', saveOptions);
     document.getElementById('sleepTimerForm').addEventListener('submit', setSleepTimer);
   });
 });
