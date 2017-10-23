@@ -72,7 +72,6 @@ const background = (function init(utils) {
   // TODO: incomplete
   function setSleepTimer(duration) {
     const expiration = Date.now() + duration;
-    console.log(expiration);
     chrome.storage.sync.set({ expiration }, () => {
       chrome.runtime.sendMessage({
         type: 'SLEEP_TIMER_SET',

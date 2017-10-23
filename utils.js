@@ -6,8 +6,8 @@ const utils = (function initUtils() {
     return matchA && matchB && matchA[1] === matchB[1];
   }
 
-  function isSleepTimerEnabled(expirationTimeInMs, curTimerInMs) {
-    return expirationTimeInMs > curTimerInMs;
+  function isSleepTimerEnabled(expirationTimeInMs, curTimeInMs) {
+    return expirationTimeInMs > curTimeInMs;
   }
 
   function determineAnchorType(anchor, windowOrigin, strategy) {

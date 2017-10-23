@@ -1,6 +1,6 @@
 const strategy = (function init(utils, origin) {
   function shouldIgnore(anchor) {
-    return /\/messages\/t\//.test(anchor.href);
+    return /\/messages\/t\//.test(anchor.href) || anchor.getAttribute('ajaxify');
   }
 
   function shouldTreatAsRelative() {
