@@ -22,34 +22,56 @@ describe('Test util functions', () => {
     });
   });
 
-  describe('#shouldntAddListener', () => {
-    var anchor = factory.anchor();
+  describe('#shouldIgnore', () => {
 
-    it('returns true for an empty href', () => {
-      anchor.setAttribute('href', '');
-      expect(utils.shouldntAddListener(anchor)).to.be.true;
-    })
-    it('returns true for an "#" href', () => {
-      anchor.setAttribute('href', '#backers');
-      expect(utils.shouldntAddListener(anchor)).to.be.true;
-    })
-    it('returns true for absolute path with page anchor', () => {
-      anchor.setAttribute('href', "https://mochajs.org/#backers");
-      expect(utils.shouldntAddListener(anchor)).to.be.true;
-    })
-    it('returns true for href with "javascript"', () => {
-      anchor.setAttribute('href', 'javascript:void(0)');
-      expect(utils.shouldntAddListener(anchor)).to.be.true;
-    })
-    it('returns true for anchor with onclick attribute', () => {
-      anchor.setAttribute('href', 'http://www.google.com/');
-      anchor.setAttribute('onclick', function() {});
-      expect(utils.shouldntAddListener(anchor)).to.be.true;
-    })
-    it('returns false for an absolute path', () => {
-      anchor.setAttribute('href', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty');
-      expect(utils.shouldntAddListener(anchor)).to.be.true;
-    })
+    var anchor;
+
+    beforeEach(() => {
+      anchor = factory.anchor();
+    });
+
+    describe('without a strategy', () => {
+      it('returns true for an empty href', () => {
+        anchor.setAttribute('href', '');
+        expect(utils.shouldIgnore(anchor)).to.be.true;
+      });
+      it('returns true for an "#" href', () => {
+        anchor.setAttribute('href', '#backers');
+        expect(utils.shouldIgnore(anchor)).to.be.true;
+      });
+      it('returns true for absolute path with page anchor', () => {
+        anchor.setAttribute('href', "https://mochajs.org/#backers");
+        expect(utils.shouldIgnore(anchor)).to.be.true;
+      });
+      it('returns true for href with "javascript"', () => {
+        anchor.setAttribute('href', 'javascript:void(0)');
+        expect(utils.shouldIgnore(anchor)).to.be.true;
+      });
+      it('returns false for an absolute path', () => {
+        anchor.setAttribute('href', 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty');
+        expect(utils.shouldIgnore(anchor)).to.be.false;
+      });
+      it('returns true for anchor with onclick attribute', () => {
+        anchor.setAttribute('href', 'http://www.google.com/');
+        anchor.setAttribute('onclick', function() {});
+        expect(utils.shouldIgnore(anchor)).to.be.true;
+      });
+    });
+
+    describe('with a strategy', () => {
+
+      it('returns true if strategy.shouldIgnore() is true', () => {
+        var strategy = factory.strategy(false,false,true);
+        anchor.setAttribute('href', 'http://www.google.com/');
+        expect(utils.shouldIgnore(anchor, strategy)).to.be.true;
+      });
+
+      it('returns false if strategy.shouldIgnore is false', () => {
+        var strategy = factory.strategy(false,false,false);
+        anchor.setAttribute('href', 'http://www.google.com/');
+        expect(utils.shouldIgnore(anchor, strategy)).to.be.false;
+      });
+    });
   });
 
   describe('#determineAnchorType', () => {

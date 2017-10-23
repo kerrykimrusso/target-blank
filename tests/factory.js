@@ -11,10 +11,11 @@ const factory = {
       altKey: false,
     }
   },
-  strategy: function(relativeBool, absoluteBool) {
+  strategy: function(relativeBool, absoluteBool, shouldIgnoreBool) {
     return {
       shouldTreatAsRelative: function(anchor) { return relativeBool },
       shouldTreatAsAbsolute: function(anchor) { return absoluteBool },
+      shouldIgnore: function(anchor) { return shouldIgnoreBool },
     }
   }
 }

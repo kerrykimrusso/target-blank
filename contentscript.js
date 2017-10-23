@@ -1,7 +1,7 @@
 (function init(utils, strategy, location) {
   function addClickListener(anchorTags) {
     anchorTags.forEach((a) => {
-      if (utils.shouldntAddListener(a)) return;
+      if (utils.shouldIgnore(a, strategy)) return;
 
       a.addEventListener('click', (e) => {
         // TODO check for sleep timer

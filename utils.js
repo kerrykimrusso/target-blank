@@ -19,10 +19,9 @@ const utils = (function initUtils() {
     return 'absolute';
   }
 
-  function shouldntAddListener(anchor) {
+  function shouldIgnore(anchor, strategy) {
     const href = anchor.getAttribute('href');
-    if (!href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick) return true;
-    return false;
+    return !href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick || (!!strategy && strategy.shouldIgnore(anchor));
   }
 
   function shouldDoOppositeTabAction(keyPressed, oppositeKey) {
@@ -38,7 +37,7 @@ const utils = (function initUtils() {
 
   return {
     hasSameDomain,
-    shouldntAddListener,
+    shouldIgnore,
     determineAnchorType,
     isSleepTimerEnabled,
     shouldDoOppositeTabAction,
