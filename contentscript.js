@@ -6,7 +6,7 @@ const init = (function init(utils, strategy, location) {
 
         a.addEventListener('click', (e) => {
           if (utils.isSleepTimerEnabled(options.expiration, Date.now())) return;
-          if (utils.isWhitelisted(options.whitelist, location.origin)) return;
+          if (utils.isWhitelisted(options.whitelist, utils.getOriginOfUrl(location.origin))) return;
 
           // ignore if middle or right click
           if (e.which > 1 && e.which < 4) return;
