@@ -73,9 +73,30 @@ const init = (function init(utils) {
       }
     }
 
+    function restoreWhitelistButton(options) {
+      chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      }, (tabs) => {
+        const url = tabs[0].url;
+        function toggleWhitelist(e) {
+          const type = utils.isWhitelisted(options.whitelist || [], url) ? 'REMOVE_FROM_WHITELIST' : 'ADD_TO_WHITELIST';
+          chrome.runtime.sendMessage({
+            type,
+            payload: url,
+          });
+        }
+
+        const btn = document.querySelector('#whitelist');
+        btn.addEventListener('click', toggleWhitelist);
+        btn.removeAttribute('disabled');
+      });
+    }
+
     chrome.storage.sync.get(null, (options) => {
       restoreOptionsForm(options);
       restoreSleepTimerForm(options);
+      restoreWhitelistButton(options);
 
       chrome.runtime.onMessage.addListener((msg) => {
         const messageHandlers = {

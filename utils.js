@@ -1,13 +1,23 @@
 const utils = (function initUtils() {
+  const originRegexp = /(?:\w+\.)*(\w+\.\w+)/;
+
   function hasSameDomain(a, b) {
-    const regex = /(?:\w+\.)*(\w+\.\w+)/;
-    const matchA = a.match(regex);
-    const matchB = b.match(regex);
+    const matchA = a.match(originRegexp);
+    const matchB = b.match(originRegexp);
     return matchA && matchB && matchA[1] === matchB[1];
+  }
+
+  function getOriginOfUrl(url) {
+    const matches = url.match(originRegexp);
+    return matches && matches.length ? matches[0] : null;
   }
 
   function isSleepTimerEnabled(expirationTimeInMs, curTimeInMs) {
     return expirationTimeInMs > curTimeInMs;
+  }
+
+  function isWhitelisted(whitelist, url) {
+    return whitelist.indexOf(url) > -1;
   }
 
   function determineAnchorType(anchor, windowOrigin, strategy) {
@@ -37,6 +47,8 @@ const utils = (function initUtils() {
     determineAnchorType,
     isSleepTimerEnabled,
     keyHeldDuringClick,
+    isWhitelisted,
+    getOriginOfUrl,
   };
 }());
 
