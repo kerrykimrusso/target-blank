@@ -25,14 +25,6 @@ const init = (function init(utils) {
       });
     }
 
-    function onOptionsSaved() {
-      // const status = document.getElementById('status');
-      // status.textContent = 'Options saved.';
-      // setTimeout(() => {
-      //   status.textContent = '';
-      // }, 750);
-    }
-
     function displaySleepTimerStatus(expirationTimeFormatted) {
       const status = document.querySelector('#sleepToggleForm .status');
       status.textContent = `Will wake up at ${expirationTimeFormatted} tomorrow`;
@@ -78,18 +70,20 @@ const init = (function init(utils) {
         active: true,
         currentWindow: true,
       }, (tabs) => {
-        const url = tabs[0].url;
+        const origin = utils.getOriginOfUrl(tabs[0].url);
         function toggleWhitelist(e) {
-          const type = utils.isWhitelisted(options.whitelist || [], url) ? 'REMOVE_FROM_WHITELIST' : 'ADD_TO_WHITELIST';
+          e.preventDefault();
+          const type = utils.isWhitelisted(options.whitelist || [], origin) ? 'REMOVE_FROM_WHITELIST' : 'ADD_TO_WHITELIST';
           chrome.runtime.sendMessage({
             type,
-            payload: url,
+            payload: origin,
           });
         }
 
         const btn = document.querySelector('#whitelist');
-        btn.addEventListener('click', toggleWhitelist);
         btn.removeAttribute('disabled');
+        btn.textContent = utils.isWhitelisted(options.whitelist || [], origin) ? 'Remove From Whitelist' : 'Add To Whitelist';
+        btn.addEventListener('click', toggleWhitelist);
       });
     }
 
@@ -100,7 +94,6 @@ const init = (function init(utils) {
 
       chrome.runtime.onMessage.addListener((msg) => {
         const messageHandlers = {
-          OPTIONS_SAVED: onOptionsSaved,
           SLEEP_TIMER_SET: onSleepTimerSet,
         };
 

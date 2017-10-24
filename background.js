@@ -97,8 +97,7 @@ const background = (function init(utils) {
     });
   }
 
-  function addToWhitelist(url) {
-    const origin = utils.getOriginOfUrl(url);
+  function addToWhitelist(origin) {
     const newOptions = {
       whitelist: [...options.whitelist, origin],
     };
@@ -111,8 +110,7 @@ const background = (function init(utils) {
     });
   }
 
-  function removeFromWhitelist(url) {
-    const origin = utils.getOriginOfUrl(url);
+  function removeFromWhitelist(origin) {
     const newOptions = {
       whitelist: options.whitelist.filter(whitelistedUrl => whitelistedUrl !== origin),
     };
