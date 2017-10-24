@@ -87,6 +87,12 @@ const init = (function init(utils) {
       });
     }
 
+    function onOptionsUpdated(options) {
+      restoreOptionsForm(options);
+      restoreSleepTimerForm(options);
+      restoreWhitelistButton(options);
+    }
+
     chrome.storage.sync.get(null, (options) => {
       restoreOptionsForm(options);
       restoreSleepTimerForm(options);
@@ -95,6 +101,7 @@ const init = (function init(utils) {
       chrome.runtime.onMessage.addListener((msg) => {
         const messageHandlers = {
           SLEEP_TIMER_SET: onSleepTimerSet,
+          OPTIONS_UPDATED: onOptionsUpdated,
         };
 
         messageHandlers[msg.type](msg.payload);

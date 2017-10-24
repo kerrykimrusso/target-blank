@@ -103,10 +103,12 @@ const background = (function init(utils) {
     };
 
     saveOptionsWithCallback(newOptions, (updatedOptions) => {
-      sendMessageToActiveTab({
+      const msg = {
         type: 'OPTIONS_UPDATED',
         payload: updatedOptions,
-      });
+      };
+      sendMessageToActiveTab(msg);
+      chrome.runtime.sendMessage(msg);
     });
   }
 
@@ -116,10 +118,12 @@ const background = (function init(utils) {
     };
 
     saveOptionsWithCallback(newOptions, (updatedOptions) => {
-      sendMessageToActiveTab({
+      const msg = {
         type: 'OPTIONS_UPDATED',
         payload: updatedOptions,
-      });
+      };
+      sendMessageToActiveTab(msg);
+      chrome.runtime.sendMessage(msg);
     });
   }
 
