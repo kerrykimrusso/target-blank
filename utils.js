@@ -31,6 +31,7 @@ const utils = (function initUtils() {
 
   function shouldIgnore(anchor, strategy) {
     let href = anchor.getAttribute('href');
+    // href will be null if there is no attribute on the anchor.
     href = href ? href.trim() : href;
     return !href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick || (!!strategy && strategy.shouldIgnore(anchor));
   }
