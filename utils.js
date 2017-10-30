@@ -31,7 +31,7 @@ const utils = (function initUtils() {
 
   function shouldIgnore(anchor, strategy) {
     const href = anchor.getAttribute('href');
-    return !href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick || (!!strategy && strategy.shouldIgnore(anchor));
+    return !href || href.includes('#') || href.trim().startsWith('javascript') || !!anchor.onclick || (!!strategy && strategy.shouldIgnore(anchor));
   }
 
   function keyHeldDuringClick(event) {
