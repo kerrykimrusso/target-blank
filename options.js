@@ -65,38 +65,57 @@ const init = (function init(utils) {
       }
     }
 
-    function restoreWhitelistButton(options) {
+    let toggleWhitelist = function toggleWhitelist(origin, options) {
+      const type = utils.isWhitelisted(options.whitelist, origin) ? 'REMOVE_FROM_WHITELIST' : 'ADD_TO_WHITELIST';
+      console.log(type);
+      chrome.runtime.sendMessage({
+        type,
+        payload: origin,
+      });
+    };
+
+    function getActiveTabUrl(callback) {
       chrome.tabs.query({
         active: true,
         currentWindow: true,
       }, (tabs) => {
-        const origin = utils.getOriginOfUrl(tabs[0].url);
-        function toggleWhitelist(e) {
-          e.preventDefault();
-          const type = utils.isWhitelisted(options.whitelist || [], origin) ? 'REMOVE_FROM_WHITELIST' : 'ADD_TO_WHITELIST';
-          chrome.runtime.sendMessage({
-            type,
-            payload: origin,
-          });
-        }
-
-        const btn = document.querySelector('#whitelist');
-        btn.removeAttribute('disabled');
-        btn.textContent = utils.isWhitelisted(options.whitelist || [], origin) ? 'Remove From Whitelist' : 'Add To Whitelist';
-        btn.addEventListener('click', toggleWhitelist);
+        if (callback) callback(tabs[0].url);
       });
+    }
+
+    let restoreWhitelistButton = function restoreWhitelistButton(btn, origin, options) {
+      btn.removeAttribute('disabled');
+      btn.textContent = utils.isWhitelisted(options.whitelist, origin) ? 'Remove From Whitelist' : 'Add To Whitelist';
+    };
+
+    let toggleWhitelistCall;
+
+    function toggleWhitelistWithOptions(options) {
+      return toggleWhitelist.bind(null, options);
     }
 
     function onOptionsUpdated(options) {
       restoreOptionsForm(options);
       restoreSleepTimerForm(options);
       restoreWhitelistButton(options);
+      toggleWhitelistCall = toggleWhitelistWithOptions(options);
     }
 
     chrome.storage.sync.get(null, (options) => {
       restoreOptionsForm(options);
       restoreSleepTimerForm(options);
-      restoreWhitelistButton(options);
+      getActiveTabUrl((url) => {
+        const btn = document.querySelector('#whitelist');
+        const origin = utils.getOriginOfUrl(url);
+        restoreWhitelistButton = restoreWhitelistButton.bind(null, btn, origin);
+        restoreWhitelistButton(options);
+        toggleWhitelist = toggleWhitelist.bind(null, origin);
+        toggleWhitelistCall = toggleWhitelistWithOptions(options);
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          toggleWhitelistCall();
+        });
+      });
 
       chrome.runtime.onMessage.addListener((msg) => {
         const messageHandlers = {
