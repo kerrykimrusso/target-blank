@@ -19,6 +19,14 @@ const background = (function init(utils) {
     });
   }
 
+  function saveOptionsWithCallback(newOptions, callback) {
+    chrome.storage.sync.set(newOptions, () => {
+      options = Object.assign({}, options, newOptions);
+
+      if (callback) callback(options);
+    });
+  }
+
   function restoreOptions() {
     chrome.storage.sync.get(null, (curOptions) => {
       options = Object.assign({}, options, curOptions);
@@ -80,12 +88,53 @@ const background = (function init(utils) {
     });
   }
 
+  function sendMessageToActiveTab(msg) {
+    chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, msg);
+    });
+  }
+
+  function addToWhitelist(origin) {
+    const newOptions = {
+      whitelist: [...options.whitelist, origin],
+    };
+
+    saveOptionsWithCallback(newOptions, (updatedOptions) => {
+      const msg = {
+        type: 'OPTIONS_UPDATED',
+        payload: updatedOptions,
+      };
+      sendMessageToActiveTab(msg);
+      chrome.runtime.sendMessage(msg);
+    });
+  }
+
+  function removeFromWhitelist(origin) {
+    const newOptions = {
+      whitelist: options.whitelist.filter(whitelistedUrl => whitelistedUrl !== origin),
+    };
+
+    saveOptionsWithCallback(newOptions, (updatedOptions) => {
+      const msg = {
+        type: 'OPTIONS_UPDATED',
+        payload: updatedOptions,
+      };
+      sendMessageToActiveTab(msg);
+      chrome.runtime.sendMessage(msg);
+    });
+  }
+
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     // map message type to handler
     const messageHandlers = {
       LINK_CLICKED: onLinkClicked,
       SAVE_OPTIONS_BTN_CLICKED: saveOptions,
       SET_SLEEP_TIMER: setSleepTimer,
+      ADD_TO_WHITELIST: addToWhitelist,
+      REMOVE_FROM_WHITELIST: removeFromWhitelist,
     };
 
     messageHandlers[msg.type](msg.payload, sendResponse);
