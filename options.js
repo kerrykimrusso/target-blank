@@ -83,7 +83,7 @@ const init = (function init(utils) {
         const btn = document.querySelector('#whitelist');
         btn.removeAttribute('disabled');
         btn.textContent = utils.isWhitelisted(options.whitelist || [], origin) ? 'Remove From Whitelist' : 'Add To Whitelist';
-        btn.addEventListener('click', toggleWhitelist);
+        btn.addEventListener('click', toggleWhitelist, { once: true });
       });
     }
 
