@@ -1,6 +1,6 @@
 const background = (function init(utils) {
   let options = {
-    relative: 'same-tab',
+    relative: 'new-tab',
     absolute: 'new-tab',
     tab: 'right',
     expiration: 0,
@@ -29,7 +29,9 @@ const background = (function init(utils) {
 
   function restoreOptions() {
     chrome.storage.sync.get(null, (curOptions) => {
-      options = Object.assign({}, options, curOptions);
+      newOptions = Object.assign({}, options, curOptions);
+
+      saveOptionsWithCallback(newOptions);
     });
   }
 
