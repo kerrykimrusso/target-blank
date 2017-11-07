@@ -79,13 +79,27 @@ const background = (function init(utils) {
 
   // TODO: incomplete
   function setSleepTimer(duration) {
-    const expiration = Date.now() + duration;
-    chrome.storage.sync.set({ expiration }, () => {
+    const newOptions = {
+      expiration: Date.now() + duration,
+    };
+
+    function broadcast(updatedOptions) {
+      chrome.tabs.query({}, (tabs) => {
+        debugger;
+        tabs.forEach((tab) => {
+          chrome.tabs.sendMessage(tab.id, {
+            type: 'OPTIONS_UPDATED',
+            payload: updatedOptions,
+          });
+        });
+      });
       chrome.runtime.sendMessage({
         type: 'SLEEP_TIMER_SET',
-        payload: expiration,
+        payload: updatedOptions.expiration,
       });
-    });
+    }
+
+    saveOptionsWithCallback(newOptions, broadcast.bind(this));
   }
 
   function sendMessageToActiveTab(msg) {
