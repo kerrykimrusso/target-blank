@@ -1,6 +1,6 @@
 const background = (function init(utils) {
   let options = {
-    relative: 'new-tab',
+    relative: 'same-tab',
     absolute: 'new-tab',
     tab: 'right',
     expiration: 0,
