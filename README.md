@@ -15,11 +15,11 @@ A Google Chrome extension for unifying link behavior across the web.
 To add the target-blank extension, follow the steps below:
 
 - Clone or download the latest version of the source code
-- Open your Chrome browser
+- Open your Chrome browser (if it isn't already)
 - On the top right of your browser, click the "more options" menu (three dots vertically placed)
 - Hover over "More Tools", then click "Extensions" in the overflow menu
 - On the top left of the Extension settings, click the "Load unpacked extension..." button
-- Find the location of the folder target-blank folder you downloaded and select it
+- Find the location of the download file, unzip it (if you haven't already), select the folder
 - Target-blank should appear at the top of the extension list
 
 ### Feedback
