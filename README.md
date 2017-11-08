@@ -32,7 +32,7 @@ While target-blank is still in alpha, we could use some help with a few things:
 
 **Most importantly, we *need* to know if certain behavior isn't working as expected on specific sites.**
 
-If you are able, report bugs and unexpected behavior by contributing with issues ([see below](#contributing). Otherwise, questions/comments/suggestions/compliments/virtual hugs can be directed to targetdashblank@gmail.com. 
+If you are able, report bugs and unexpected behavior by contributing with issues ([see below](#contributing)). Otherwise, questions/comments/suggestions/compliments/virtual hugs can be directed to targetdashblank@gmail.com. 
 
 ### Contributing
 
