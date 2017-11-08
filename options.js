@@ -108,10 +108,6 @@ const init = (function init(utils) {
       });
 
       document.getElementById('optionsForm').addEventListener('change', saveOptions);
-      document.getElementById('sleepTimerForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        setSleepTimer(e.target.duration.value);
-      });
       document.querySelector('#sleepToggleForm').toggle.addEventListener('change', (e) => {
         e.preventDefault();
 
