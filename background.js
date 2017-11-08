@@ -29,9 +29,7 @@ const background = (function init(utils) {
 
   function restoreOptions() {
     chrome.storage.sync.get(null, (curOptions) => {
-      newOptions = Object.assign({}, options, curOptions);
-
-      saveOptionsWithCallback(newOptions);
+      saveOptionsWithCallback(Object.assign({}, options, curOptions));
     });
   }
 
