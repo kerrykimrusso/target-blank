@@ -38,7 +38,7 @@ const background = (function init(utils) {
       case 'start':
         return 0;
       case 'end':
-        return Number.MAX_SAFE_INTEGER;
+        return 9999;
       case 'left':
         return tab.index;
       default: // 'right'
