@@ -18,7 +18,7 @@
     }
 
     .label-text {
-      display: block;
+      display: inline-block;
       font-size: 1.125em;
       padding: .25em .25em .25em 0;
     }
@@ -32,6 +32,12 @@
       display: block;
       width: 100%;
       margin-bottom:.25em;
+    }
+
+    .status {
+      margin-top: -1em;
+      height: 1em;
+      text-indent: 1.5em;
     }
 
     #status {
@@ -87,8 +93,9 @@
 
   <form id="sleepToggleForm" >
     <div class="setting">
-      <label><span class="label-text">Suspend extension:</span>
+      <label>
         <input type="checkbox" name="toggle" value="1" />
+        <span class="label-text">Suspend extension temporarily</span>
       </label>
     </div>
     <div class="setting">
@@ -97,6 +104,7 @@
   </form>
 
   <div class="setting">
+    <span class="label-text">Disable extension for this domain:</span>
     <button id="whitelist" class="add" disabled>Add To Whitelist</button>
   </div>
 
