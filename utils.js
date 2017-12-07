@@ -1,14 +1,14 @@
 const utils = (function initUtils() {
-  const originRegexp = /(?:\w+\.)*(\w+\.\w+)/;
+  const hostnameRegex = /(\w+\.)*(\w+\.\w+)/;
 
   function hasSameDomain(a, b) {
-    const matchA = a.match(originRegexp);
-    const matchB = b.match(originRegexp);
+    const matchA = a.match(hostnameRegex);
+    const matchB = b.match(hostnameRegex);
     return matchA && matchB && matchA[1] === matchB[1];
   }
 
   function getOriginOfUrl(url) {
-    const matches = url.match(originRegexp);
+    const matches = url.match(hostnameRegex);
     return matches && matches.length ? matches[0] : null;
   }
 
