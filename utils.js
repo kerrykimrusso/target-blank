@@ -7,7 +7,7 @@ const utils = (function initUtils() {
     return matchA && matchB && matchA[1] === matchB[1];
   }
 
-  function getOriginOfUrl(url) {
+  function getHostnameOfUrl(url) {
     const matches = url.match(hostnameRegex);
     return matches && matches.length ? matches[0] : null;
   }
@@ -50,7 +50,7 @@ const utils = (function initUtils() {
     isSleepTimerEnabled,
     keyHeldDuringClick,
     isWhitelisted,
-    getOriginOfUrl,
+    getHostnameOfUrl,
   };
 }());
 
