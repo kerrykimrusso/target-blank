@@ -1,10 +1,21 @@
 const background = (function init(utils) {
+  const getDefaultPrefs = options => Object.assign({},
+    {
+      relative: 'same-tab',
+      absolute: 'new-tab',
+      tab: 'right',
+      expiration: 0,
+    },
+    options);
+
   let options = {
-    relative: 'same-tab',
-    absolute: 'new-tab',
-    tab: 'right',
-    expiration: 0,
-    whitelist: [],
+    'www.google.com': getDefaultPrefs(),
+    'www.yahoo.com': getDefaultPrefs(),
+    'www.bing.com': getDefaultPrefs(),
+    'www.baidu.com': getDefaultPrefs(),
+    'www.duckduckgo.com': getDefaultPrefs(),
+    'www.wikipedia.org': getDefaultPrefs({ relative: 'new-tab' }),
+    'developer.mozilla.org': getDefaultPrefs({ relative: 'new-tab' }),
   };
 
   // Saves options to chrome.storage.sync.
