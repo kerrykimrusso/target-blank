@@ -1,5 +1,7 @@
 const init = (function init({ utils, enums, constants }) {
   return () => {
+    let configureUI;
+
     const objectifyForm = (form) => {
       const hash = utils.formToHash(form, {
         suspendSwitch: input => input.checked,
@@ -17,14 +19,25 @@ const init = (function init({ utils, enums, constants }) {
       utils.sendMessage(enums.SAVE_OPTIONS_REQUESTED, {
         hostname,
         prefs: prefsForm ? objectifyForm(prefsForm) : utils.getDefaultPrefs(),
+      }, ({ payload }) => {
+        configureUI({
+          hostname,
+          prefs: payload[hostname],
+        });
       });
     };
 
     const disableForHostname = hostname => () => {
-      utils.sendMessage(enums.DISABLE_REQUESTED, { hostname });
+      utils.sendMessage(enums.DISABLE_REQUESTED, { hostname },
+        ({ payload }) => {
+          configureUI({
+            hostname,
+            prefs: payload[hostname],
+          });
+        });
     };
 
-    const configureUI = (settings) => {
+    configureUI = (settings) => {
       const { hostname, prefs } = settings;
 
       const title = document.querySelector('#hostname');
@@ -51,16 +64,6 @@ const init = (function init({ utils, enums, constants }) {
       return settings;
     };
 
-    const listenForRuntimeMessages = ({ hostname }) => {
-      chrome.runtime.onMessage.addListener(({ type, payload: options }) => {
-        console.log('msg.type', type);
-        configureUI({
-          hostname,
-          prefs: options[hostname],
-        });
-      });
-    };
-
     Promise.all([utils.getOptions(), utils.getActiveTabInCurrentWindow()])
       .then(([options, activeTab]) => {
         const hostname = utils.getHostnameOfUrl(activeTab.url);
@@ -70,7 +73,6 @@ const init = (function init({ utils, enums, constants }) {
         };
       })
       .then(configureUI)
-      .then(listenForRuntimeMessages)
       .catch(console.log);
   };
 }(window));
