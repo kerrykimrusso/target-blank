@@ -16,6 +16,7 @@ const init = (function init({ utils, enums, constants }) {
 
     const savePrefsForHostname = (hostname, prefsForm) => (e) => {
       e.preventDefault();
+      console.log('saving prefs...')
       utils.sendMessage(enums.SAVE_OPTIONS_REQUESTED, {
         hostname,
         prefs: prefsForm ? objectifyForm(prefsForm) : utils.getDefaultPrefs(),
@@ -45,19 +46,27 @@ const init = (function init({ utils, enums, constants }) {
 
       const optionsForm = document.querySelector('#optionsForm');
       const button = document.querySelector('#optBtn');
-      if (prefs) {
+      if (prefs && prefs.enabled) {
         utils.setFormValues(optionsForm, prefs, {
           suspendSwitch: (input) => {
+            const status = document.querySelector('.status');
             input.checked = utils.isSleepTimerEnabled(prefs.expiration, Date.now());
+            if (input.checked) {
+              status.textContent = 'Extension will resume at ' + utils.getReadableTimeFrom(prefs.expiration)
+            } else {
+              status.textContent = ''
+            }
           },
+
         });
-        optionsForm.classList.remove('hidden');
-        optionsForm.addEventListener('change', savePrefsForHostname(hostname, optionsForm));
+        optionsForm.addEventListener('change', savePrefsForHostname(hostname, optionsForm), { once: true });
+
         button.addEventListener('click', disableForHostname(hostname), { once: true });
         button.textContent = constants.DISABLE_BUTTON_TEXT;
+        optionsForm.classList.remove('hidden');
       } else {
         optionsForm.classList.add('hidden');
-        button.addEventListener('click', savePrefsForHostname(hostname), { once: true });
+        button.addEventListener('click', savePrefsForHostname(hostname, optionsForm), { once: true });
         button.textContent = constants.ENABLE_BUTTON_TEXT;
       }
 

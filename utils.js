@@ -6,6 +6,7 @@ const utils = (function initUtils() {
         absolute: 'new-tab',
         tab: 'right',
         expiration: 0,
+        enabled: true
       },
       options);
   }
@@ -31,7 +32,7 @@ const utils = (function initUtils() {
     const year = date.getFullYear();
     const month = date.getMonth();
     const day = date.getDate();
-    return new Date(year, month, day + 1, 2, 0, 0).getMilliseconds();
+    return Date.parse(new Date(year, month, day + 1, 2, 0, 0));
   }
 
   function getReadableTimeFrom(timeInMs) {

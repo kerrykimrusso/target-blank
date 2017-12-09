@@ -1,8 +1,9 @@
 const init = (function init({ utils, strategy, location, enums, MutationSummary }) {
-  const addClickHandlers = () => {
+
+  const addClickHandlers = (prefs) => {
     const anchors = document.querySelectorAll('a');
     anchors.forEach((a) => {
-      a.addEventListener('click', onAnchorClicked);
+      a.addEventListener('click', onAnchorClicked(prefs));
     });
   };
 
@@ -14,12 +15,16 @@ const init = (function init({ utils, strategy, location, enums, MutationSummary 
         };
         messageHandlers[msg.type](msg.payload);
       });
+      const prefs = options[location.hostname]
+      if (prefs) {
+        addClickHandlers(prefs);
+      }
     })
     .catch(console.log);
 
-  const onAnchorClicked = (e) => {
+  const onAnchorClicked = (prefs) => (e) => {
     if (e.which > 1 && e.which < 4) return;
-    if (utils.isSleepTimerEnabled(options.expiration, Date.now())) return;
+    if (utils.isSleepTimerEnabled(prefs.expiration, Date.now())) return;
 
     e.preventDefault();
     e.stopImmediatePropagation();
@@ -37,11 +42,11 @@ const init = (function init({ utils, strategy, location, enums, MutationSummary 
   const mutationObserver = new MutationSummary({
     callback: (summaryObjects) => {
       summaryObjects[0].added.forEach(
-        a => a.addEventListener('click', onLinkClicked),
+        a => a.addEventListener('click', onAnchorClicked),
       );
     },
     queries: [
       { element: 'a' },
     ],
   });
-}(window));
+}({ utils: window.utils, strategy: window.strategy, location: window.location, enums: window.enums, MutationSummary }));

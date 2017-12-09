@@ -13,6 +13,7 @@ const background = (function init({ utils, enums }) {
     chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
       const messageHandlers = {
         [enums.SAVE_OPTIONS_REQUESTED]: ({ hostname, prefs }) => {
+          prefs.enabled = true;
           utils.saveOptions({ [hostname]: prefs })
             .then(utils.getOptions)
             .then((options) => {
@@ -23,7 +24,7 @@ const background = (function init({ utils, enums }) {
             });
         },
         [enums.DISABLE_REQUESTED]: ({ hostname }) => {
-          utils.removeFromOptions(hostname)
+          utils.saveOptions({ [hostname]: { enabled: false } })
             .then(utils.getOptions)
             .then((options) => {
               sendResponse({
@@ -37,6 +38,18 @@ const background = (function init({ utils, enums }) {
       return true; // allows async sendResponse call
     });
   };
+
+  const onLinkClicked = ({ anchorType, anchorUrl }) => {
+    switch (options[anchorType]) {
+      case 'same-tab':
+        openInSameTab(anchorUrl);
+        break;
+      case 'new-tab':
+      default:
+        openInNewTab(anchorUrl);
+        break;
+    }
+  }
 
   utils.getOptions()
     .then(options => ({
