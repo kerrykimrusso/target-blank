@@ -10,24 +10,11 @@ const background = (function init({ utils, enums }) {
   };
 
   const listenForRuntimeMessages = () => {
-    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-      // function onLinkClicked({ hostname, anchorType, anchorUrl }) {
-      //   switch (options[hostname][anchorType]) {
-      //     case 'new-tab':
-      //       openInNewTab(anchorUrl);
-      //       break;
-      //     case 'same-tab':
-      //     default:
-      //       openInSameTab(anchorUrl);
-      //       break;
-      //   }
-      // }
-
+    chrome.runtime.onMessage.addListener((msg, _, sendResponse) => {
       const messageHandlers = {
-        // [enums.LINK_CLICKED]: onLinkClicked,
         [enums.SAVE_OPTIONS_REQUESTED]: ({ hostname, prefs }) => {
           utils.saveOptions({ [hostname]: prefs })
-            .then(utils.getOptions())
+            .then(utils.getOptions)
             .then((options) => {
               sendResponse({
                 type: enums.SAVE_OPTIONS_SUCCEEDED,
@@ -37,7 +24,7 @@ const background = (function init({ utils, enums }) {
         },
         [enums.DISABLE_REQUESTED]: ({ hostname }) => {
           utils.removeFromOptions(hostname)
-            .then(utils.getOptions())
+            .then(utils.getOptions)
             .then((options) => {
               sendResponse({
                 type: enums.DISABLE_SUCCEEDED,
