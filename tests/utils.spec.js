@@ -22,6 +22,15 @@ describe('Test util functions', () => {
     });
   });
 
+  describe('#getOriginOfUrl', () => {
+      console.log(utils.getOriginOfUrl('http://google.com'));
+      console.log(utils.getOriginOfUrl('http://drive.google.com'));
+      console.log(utils.getOriginOfUrl('https://sports.yahoo.com'));
+      console.log(utils.getOriginOfUrl('https://www.yahoo.com/'));
+      console.log(utils.getOriginOfUrl('https://www.russianmachineneverbreaks.com/'));
+      console.log(utils.getOriginOfUrl('http://www.russianmachineneverbreaks.com/'));
+  });
+
   describe('#shouldIgnore', () => {
 
     var anchor;

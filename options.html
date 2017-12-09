@@ -52,13 +52,17 @@
       display: block;
       margin: 0 auto 2em auto;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
-
-  <form id="optionsForm">
-
+  <h3 id="hostname"></h3>
+  
+  <form id="optionsForm" class="hidden">
     <div class="setting">
       <label><span class="label-text">Open relative links in:</span>
         <select name="relative">
@@ -87,27 +91,22 @@
         </select>
       </label>
     </div>
-  </form>
 
-  <hr />
-
-  <form id="sleepToggleForm" >
     <div class="setting">
       <label>
-        <input type="checkbox" name="toggle" value="1" />
+        <input type="checkbox" name="suspendSwitch" value="1" />
         <span class="label-text">Suspend extension temporarily</span>
       </label>
-    </div>
-    <div class="setting">
       <div class="status"></div>
     </div>
   </form>
 
   <div class="setting">
-    <span class="label-text">Disable extension for this domain:</span>
-    <button id="whitelist" class="add" disabled>Add To Whitelist</button>
+    <button id="optBtn" class="add"></button>
   </div>
 
+  <script src="enums.js"></script>
+  <script src="constants.js"></script>
   <script src="utils.js"></script>
   <script src="options.js"></script>
 </body>

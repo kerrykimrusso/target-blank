@@ -1,23 +1,44 @@
 const utils = (function initUtils() {
-  const hostnameRegex = /(\w+\.)*(\w+\.\w+)/;
-
-  function hasSameDomain(a, b) {
-    const matchA = a.match(hostnameRegex);
-    const matchB = b.match(hostnameRegex);
-    return matchA && matchB && matchA[1] === matchB[1];
+  function getDefaultPrefs(options) {
+    return Object.assign({},
+      {
+        relative: 'same-tab',
+        absolute: 'new-tab',
+        tab: 'right',
+        expiration: 0,
+      },
+      options);
   }
 
+  const HOSTNAME_REGEX = /(\w+\.)*(\w+\.\w+)/i;
+
   function getHostnameOfUrl(url) {
-    const matches = url.match(hostnameRegex);
-    return matches && matches.length ? matches[0] : null;
+    const matches = url.match(HOSTNAME_REGEX);
+    return matches ? matches[0] : null;
+  }
+
+  function hasSameHostname(a, b) {
+    const matchA = this.getHostnameOfUrl(a);
+    const matchB = this.getHostnameOfUrl(b);
+    return matchA && matchB && matchA[0] === matchB[0];
   }
 
   function isSleepTimerEnabled(expirationTimeInMs, curTimeInMs) {
     return expirationTimeInMs > curTimeInMs;
   }
 
-  function isWhitelisted(whitelist, url) {
-    return whitelist.indexOf(url) > -1;
+  function get2amTomorrowInMsFrom(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    return new Date(year, month, day + 1, 2, 0, 0).getMilliseconds();
+  }
+
+  function getReadableTimeFrom(timeInMs) {
+    const expirationDate = new Date(timeInMs);
+    const timeMatches = expirationDate.toLocaleTimeString().match(/(\d+.\d+).\d+(\s+\w+)*/i);
+    const [, time, meridiem] = timeMatches;
+    return `${time}${meridiem || ''}`;
   }
 
   function determineAnchorType(anchor, windowOrigin, strategy) {
@@ -25,8 +46,30 @@ const utils = (function initUtils() {
       if (strategy.shouldTreatAsAbsolute(anchor)) return 'absolute';
       if (strategy.shouldTreatAsRelative(anchor)) return 'relative';
     }
-    if (this.hasSameDomain(anchor.origin, windowOrigin)) return 'relative';
+    if (this.hasSameHostname(anchor.origin, windowOrigin)) return 'relative';
     return 'absolute';
+  }
+
+  function formToHash(form, getters) {
+    const hash = {};
+    for (let i = 0, el; i < form.length; i += 1) {
+      el = form[i];
+      hash[el.name] = getters && getters[el.name] ?
+        getters[el.name](el) :
+        el.value;
+    }
+    return hash;
+  }
+
+  function setFormValues(form, values, setters) {
+    for (let i = 0, el; i < form.length; i += 1) {
+      el = form[i];
+      if (setters && setters[el.name]) {
+        setters[el.name](el);
+      } else {
+        el.value = values[el.name];
+      }
+    }
   }
 
   function shouldIgnore(anchor, strategy) {
@@ -36,21 +79,102 @@ const utils = (function initUtils() {
     return !href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick || (!!strategy && strategy.shouldIgnore(anchor));
   }
 
-  function keyHeldDuringClick(event) {
-    if (event.metaKey && !event.altKey) return 'command';
-    if (event.altKey && !event.metaKey) return 'alt';
+  function sendMessage(type, payload) {
+    console.log({
+      type,
+      payload,
+    });
 
-    return null;
+    chrome.runtime.sendMessage({
+      type,
+      payload,
+    });
+  }
+
+  function getActiveTabInCurrentWindow() {
+    return new Promise((resolve) => {
+      chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      }, tabs => resolve(tabs[0]));
+    });
+  }
+
+  function getOptions() {
+    return new Promise((resolve) => {
+      chrome.storage.sync.get(null, (storedOptions) => {
+        resolve(storedOptions);
+      });
+    });
+  }
+
+  function saveOptions(newOptions) {
+    return new Promise((resolve) => {
+      chrome.storage.sync.set(newOptions, () => {
+        resolve(newOptions);
+      });
+    });
+  }
+
+  function removeFromOptions(...keys) {
+    return new Promise((resolve) => {
+      chrome.storage.sync.remove(keys, () => {
+        resolve();
+      });
+    });
+  }
+
+  function createNewTab(url, newTabPref) {
+    return tab => chrome.tabs.create({
+      url,
+      active: true,
+      index: this.getNewTabIndex(tab, newTabPref),
+    });
+  }
+
+  function openInSameTab(url) {
+    chrome.tabs.update({
+      url,
+    });
+  }
+
+  function openInNewTab(url, newTabPref) {
+    this.getActiveTabInCurrentWindow()
+      .then(this.createNewTab(url, newTabPref));
+  }
+
+  function getNewTabIndex(tabIndex, val) {
+    switch (val) {
+      case 'start':
+        return 0;
+      case 'end':
+        return 9999;
+      case 'left':
+        return tabIndex;
+      default: // 'right'
+        return tabIndex + 1;
+    }
   }
 
   return {
-    hasSameDomain,
+    getDefaultPrefs,
     shouldIgnore,
     determineAnchorType,
     isSleepTimerEnabled,
-    keyHeldDuringClick,
-    isWhitelisted,
     getHostnameOfUrl,
+    get2amTomorrowInMsFrom,
+    getReadableTimeFrom,
+    hasSameHostname,
+    formToHash,
+    setFormValues,
+    sendMessage,
+    getActiveTabInCurrentWindow,
+    getOptions,
+    saveOptions,
+    removeFromOptions,
+    openInSameTab,
+    openInNewTab,
+    getNewTabIndex,
   };
 }());
 

@@ -1,169 +1,61 @@
-const background = (function init(utils) {
-  const getDefaultPrefs = options => Object.assign({},
-    {
-      relative: 'same-tab',
-      absolute: 'new-tab',
-      tab: 'right',
-      expiration: 0,
-    },
-    options);
-
-  let options = {
-    'www.google.com': getDefaultPrefs(),
-    'www.yahoo.com': getDefaultPrefs(),
-    'www.bing.com': getDefaultPrefs(),
-    'www.baidu.com': getDefaultPrefs(),
-    'www.duckduckgo.com': getDefaultPrefs(),
-    'www.wikipedia.org': getDefaultPrefs({ relative: 'new-tab' }),
-    'developer.mozilla.org': getDefaultPrefs({ relative: 'new-tab' }),
+const background = (function init({ utils, enums }) {
+  const defaultOptions = {
+    'www.google.com': utils.getDefaultPrefs(),
+    'www.yahoo.com': utils.getDefaultPrefs(),
+    'www.bing.com': utils.getDefaultPrefs(),
+    'www.baidu.com': utils.getDefaultPrefs(),
+    'www.duckduckgo.com': utils.getDefaultPrefs(),
+    'www.wikipedia.org': utils.getDefaultPrefs({ relative: 'new-tab' }),
+    'developer.mozilla.org': utils.getDefaultPrefs({ relative: 'new-tab' }),
   };
 
-  // Saves options to chrome.storage.sync.
-  function saveOptions(newOptions, sendResponse) {
-    chrome.storage.sync.set(newOptions, () => {
-      options = Object.assign({}, options, newOptions);
+  const listenForRuntimeMessages = () => {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+      // function onLinkClicked({ hostname, anchorType, anchorUrl }) {
+      //   switch (options[hostname][anchorType]) {
+      //     case 'new-tab':
+      //       openInNewTab(anchorUrl);
+      //       break;
+      //     case 'same-tab':
+      //     default:
+      //       openInSameTab(anchorUrl);
+      //       break;
+      //   }
+      // }
 
-      sendResponse({
-        type: 'OPTIONS_SAVED',
-        payload: newOptions,
-      });
-    });
-  }
-
-  function saveOptionsWithCallback(newOptions, callback) {
-    chrome.storage.sync.set(newOptions, () => {
-      options = Object.assign({}, options, newOptions);
-
-      if (callback) callback(options);
-    });
-  }
-
-  function restoreOptions() {
-    chrome.storage.sync.get(null, (curOptions) => {
-      saveOptionsWithCallback(Object.assign({}, options, curOptions));
-    });
-  }
-
-  function getNewTabIndex(tab, val) {
-    switch (val) {
-      case 'start':
-        return 0;
-      case 'end':
-        return 9999;
-      case 'left':
-        return tab.index;
-      default: // 'right'
-        return tab.index + 1;
-    }
-  }
-
-  function openInSameTab(url) {
-    chrome.tabs.update({
-      url,
-    });
-  }
-
-  function openInNewTab(url) {
-    chrome.tabs.query({
-      active: true,
-      currentWindow: true,
-    }, (tabs) => {
-      chrome.tabs.create({
-        url,
-        active: true,
-        index: getNewTabIndex(tabs[0], options.tab),
-      });
-    });
-  }
-
-  function onLinkClicked({ anchorType, anchorUrl }) {
-    switch (options[anchorType]) {
-      case 'same-tab':
-        openInSameTab(anchorUrl);
-        break;
-      case 'new-tab':
-      default:
-        openInNewTab(anchorUrl);
-        break;
-    }
-  }
-
-  // TODO: incomplete
-  function setSleepTimer(duration) {
-    const newOptions = {
-      expiration: Date.now() + duration,
-    };
-
-    function broadcast(updatedOptions) {
-      chrome.tabs.query({}, (tabs) => {
-        debugger;
-        tabs.forEach((tab) => {
-          chrome.tabs.sendMessage(tab.id, {
-            type: 'OPTIONS_UPDATED',
-            payload: updatedOptions,
-          });
-        });
-      });
-      chrome.runtime.sendMessage({
-        type: 'SLEEP_TIMER_SET',
-        payload: updatedOptions.expiration,
-      });
-    }
-
-    saveOptionsWithCallback(newOptions, broadcast.bind(this));
-  }
-
-  function sendMessageToActiveTab(msg) {
-    chrome.tabs.query({
-      active: true,
-      currentWindow: true,
-    }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, msg);
-    });
-  }
-
-  function addToWhitelist(origin) {
-    const newOptions = {
-      whitelist: [...options.whitelist, origin],
-    };
-
-    saveOptionsWithCallback(newOptions, (updatedOptions) => {
-      const msg = {
-        type: 'OPTIONS_UPDATED',
-        payload: updatedOptions,
+      const messageHandlers = {
+        // [enums.LINK_CLICKED]: onLinkClicked,
+        [enums.SAVE_OPTIONS_REQUESTED]: ({ hostname, prefs }) => {
+          utils.saveOptions({ [hostname]: prefs })
+            .then(utils.getOptions())
+            .then((options) => {
+              sendResponse({
+                type: enums.SAVE_OPTIONS_SUCCEEDED,
+                payload: options,
+              });
+            });
+        },
+        [enums.DISABLE_REQUESTED]: ({ hostname }) => {
+          utils.removeFromOptions(hostname)
+            .then(utils.getOptions())
+            .then((options) => {
+              sendResponse({
+                type: enums.DISABLE_SUCCEEDED,
+                payload: options,
+              });
+            });
+        },
       };
-      sendMessageToActiveTab(msg);
-      chrome.runtime.sendMessage(msg);
+      messageHandlers[msg.type](msg.payload, sendResponse);
     });
-  }
+  };
 
-  function removeFromWhitelist(origin) {
-    const newOptions = {
-      whitelist: options.whitelist.filter(whitelistedUrl => whitelistedUrl !== origin),
-    };
-
-    saveOptionsWithCallback(newOptions, (updatedOptions) => {
-      const msg = {
-        type: 'OPTIONS_UPDATED',
-        payload: updatedOptions,
-      };
-      sendMessageToActiveTab(msg);
-      chrome.runtime.sendMessage(msg);
-    });
-  }
-
-  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    // map message type to handler
-    const messageHandlers = {
-      LINK_CLICKED: onLinkClicked,
-      SAVE_OPTIONS_BTN_CLICKED: saveOptions,
-      SET_SLEEP_TIMER: setSleepTimer,
-      ADD_TO_WHITELIST: addToWhitelist,
-      REMOVE_FROM_WHITELIST: removeFromWhitelist,
-    };
-
-    messageHandlers[msg.type](msg.payload, sendResponse);
-  });
-
-  restoreOptions();
-}(window.utils));
+  utils.getOptions()
+    .then(options => ({
+      ...defaultOptions,
+      ...options,
+    }))
+    .then(utils.saveOptions)
+    .then(listenForRuntimeMessages)
+    .catch(console.log);
+}(window));
