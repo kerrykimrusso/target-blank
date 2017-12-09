@@ -12,7 +12,7 @@
 		"storage"
 	],
 	"background": {
-		"scripts": ["enums.js", "utils.js", "background.js"],
+		"scripts": ["constants.js", "enums.js", "utils.js", "background.js"],
 		"persistent": false
 	},
 	"browser_action": {
@@ -23,7 +23,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["enums.js", "utils.js"],
+      "js": ["constants.js", "enums.js", "utils.js"],
       "all_frames": true
     },
     {
