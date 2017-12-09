@@ -34,6 +34,7 @@ const background = (function init({ utils, enums }) {
         },
       };
       messageHandlers[msg.type](msg.payload, sendResponse);
+      return true; // allows async sendResponse call
     });
   };
 
