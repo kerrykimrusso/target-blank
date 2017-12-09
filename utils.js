@@ -79,16 +79,11 @@ const utils = (function initUtils() {
     return !href || href.includes('#') || href.startsWith('javascript') || !!anchor.onclick || (!!strategy && strategy.shouldIgnore(anchor));
   }
 
-  function sendMessage(type, payload) {
-    console.log({
-      type,
-      payload,
-    });
-
+  function sendMessage(type, payload, responseHandler) {
     chrome.runtime.sendMessage({
       type,
       payload,
-    });
+    }, responseHandler);
   }
 
   function getActiveTabInCurrentWindow() {
