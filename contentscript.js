@@ -1,5 +1,6 @@
 const init = (function init({ utils, strategy, location, enums, MutationSummary }) {
-
+  let mutationObserver;
+  
   const addClickHandlers = () => {
     const anchors = document.querySelectorAll('a');
     anchors.forEach((a) => {
@@ -21,6 +22,7 @@ const init = (function init({ utils, strategy, location, enums, MutationSummary 
           [enums.SAVE_OPTIONS_SUCCEEDED]: (newOptions) => {
             const newPrefs = newOptions[location.hostname];
             if (newPrefs && !utils.isSleepTimerEnabled(newPrefs.expiration, Date.now())) {
+              console.log('adding click handler...')
               addClickHandlers();
             } else {
               removeClickHandlers();
@@ -33,6 +35,18 @@ const init = (function init({ utils, strategy, location, enums, MutationSummary 
       if (prefs && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
         addClickHandlers();
       }
+      mutationObserver = new MutationSummary({
+        callback: (summaryObjects) => {
+          if (prefs && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
+            summaryObjects[0].added.forEach(
+              a => a.addEventListener('click', onAnchorClicked),
+            );
+          }
+        },
+        queries: [
+          { element: 'a' },
+        ],
+      });
     })
     .catch(console.log);
 
@@ -51,15 +65,4 @@ const init = (function init({ utils, strategy, location, enums, MutationSummary 
       },
     );
   };
-
-  const mutationObserver = new MutationSummary({
-    callback: (summaryObjects) => {
-      summaryObjects[0].added.forEach(
-        a => a.addEventListener('click', onAnchorClicked),
-      );
-    },
-    queries: [
-      { element: 'a' },
-    ],
-  });
 }({ utils: window.utils, strategy: window.strategy, location: window.location, enums: window.enums, MutationSummary }));
