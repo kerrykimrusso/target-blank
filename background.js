@@ -17,10 +17,13 @@ const background = (function init({ utils, enums }) {
           utils.saveOptions({ [hostname]: prefs })
             .then(utils.getOptions)
             .then((options) => {
-              sendResponse({
+              const message = {
                 type: enums.SAVE_OPTIONS_SUCCEEDED,
                 payload: options,
-              });
+              };
+
+              sendResponse(message);
+              utils.sendMessageAllTabsMatchingHostname(message, hostname);
             });
         },
         [enums.DISABLE_REQUESTED]: ({ hostname }) => {
@@ -33,23 +36,28 @@ const background = (function init({ utils, enums }) {
               });
             });
         },
+        [enums.LINK_CLICKED]: ({ hostname, anchorType, anchorUrl }) => {
+          utils.getOptions()
+            .then((options) => {
+              const prefs = options[hostname];
+              if (prefs && prefs.enabled) {
+                switch (prefs[anchorType]) {
+                  case 'same-tab':
+                    utils.openInSameTab(anchorUrl);
+                    break;
+                  case 'new-tab':
+                  default:
+                    utils.openInNewTab(anchorUrl, prefs.tab);
+                    break;
+                }
+              }
+            });
+        },
       };
       messageHandlers[msg.type](msg.payload, sendResponse);
       return true; // allows async sendResponse call
     });
   };
-
-  const onLinkClicked = ({ anchorType, anchorUrl }) => {
-    switch (options[anchorType]) {
-      case 'same-tab':
-        openInSameTab(anchorUrl);
-        break;
-      case 'new-tab':
-      default:
-        openInNewTab(anchorUrl);
-        break;
-    }
-  }
 
   utils.getOptions()
     .then(options => ({
