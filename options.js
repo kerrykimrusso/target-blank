@@ -16,7 +16,6 @@ const init = (function init({ utils, enums, constants }) {
 
     const savePrefsForHostname = (hostname, prefsForm) => (e) => {
       e.preventDefault();
-      console.log('saving prefs...')
       utils.sendMessage(enums.SAVE_OPTIONS_REQUESTED, {
         hostname,
         prefs: prefsForm ? objectifyForm(prefsForm) : utils.getDefaultPrefs(),
@@ -52,9 +51,9 @@ const init = (function init({ utils, enums, constants }) {
             const status = document.querySelector('.status');
             input.checked = utils.isSleepTimerEnabled(prefs.expiration, Date.now());
             if (input.checked) {
-              status.textContent = 'Extension will resume at ' + utils.getReadableTimeFrom(prefs.expiration)
+              status.textContent = `Extension will resume at ${utils.getReadableTimeFrom(prefs.expiration)}`;
             } else {
-              status.textContent = ''
+              status.textContent = '';
             }
           },
 
