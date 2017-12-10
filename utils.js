@@ -96,10 +96,10 @@ const utils = (function initUtils() {
     });
   }
 
-  function sendMessageAllTabsMatchingHostname(message, hostname) {
+  function sendMessageToAllTabsMatchingHostname(message, hostname) {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
-        if (utils.hasSameHostname(tab.url, hostname)) {
+        if (tab.url && utils.hasSameHostname(tab.url, hostname)) {
           chrome.tabs.sendMessage(tab.id, message);
         }
       });
@@ -174,7 +174,7 @@ const utils = (function initUtils() {
     formToHash,
     setFormValues,
     sendMessage,
-    sendMessageAllTabsMatchingHostname,
+    sendMessageToAllTabsMatchingHostname,
     getActiveTabInCurrentWindow,
     getOptions,
     saveOptions,

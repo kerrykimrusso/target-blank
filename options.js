@@ -6,7 +6,6 @@ const init = (function init({ utils, enums, constants }) {
       const hash = utils.formToHash(form, {
         suspendSwitch: input => input.checked,
       });
-
       hash.expiration = hash.suspendSwitch ?
         utils.get2amTomorrowInMsFrom(new Date()) :
         0;

@@ -21,9 +21,8 @@ const background = (function init({ utils, enums }) {
                 type: enums.SAVE_OPTIONS_SUCCEEDED,
                 payload: options,
               };
-
               sendResponse(message);
-              utils.sendMessageAllTabsMatchingHostname(message, hostname);
+              utils.sendMessageToAllTabsMatchingHostname(message, hostname);
             });
         },
         [enums.DISABLE_REQUESTED]: ({ hostname }) => {

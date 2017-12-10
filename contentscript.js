@@ -1,38 +1,51 @@
 const init = (function init({ utils, strategy, location, enums, MutationSummary }) {
 
-  const addClickHandlers = (prefs) => {
+  const addClickHandlers = () => {
     const anchors = document.querySelectorAll('a');
     anchors.forEach((a) => {
-      a.addEventListener('click', onAnchorClicked(prefs));
+      a.addEventListener('click', onAnchorClicked);
     });
   };
+
+  const removeClickHandlers = () => {
+    const anchors = document.querySelectorAll('a');
+    anchors.forEach((a) => {
+      a.removeEventListener('click', onAnchorClicked);
+    });
+  }
 
   utils.getOptions()
     .then((options) => {
       chrome.runtime.onMessage.addListener((msg) => {
         const messageHandlers = {
-          [enums.SAVE_OPTIONS_SUCCESSFUL]: onOptionsUpdated,
+          [enums.SAVE_OPTIONS_SUCCEEDED]: (newOptions) => {
+            const newPrefs = newOptions[location.hostname];
+            if (newPrefs && !utils.isSleepTimerEnabled(newPrefs.expiration, Date.now())) {
+              addClickHandlers();
+            } else {
+              removeClickHandlers();
+            }
+          },
         };
         messageHandlers[msg.type](msg.payload);
       });
-      const prefs = options[location.hostname]
-      if (prefs) {
-        addClickHandlers(prefs);
+      const prefs = options[location.hostname];
+      if (prefs && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
+        addClickHandlers();
       }
     })
     .catch(console.log);
 
-  const onAnchorClicked = (prefs) => (e) => {
+  const onAnchorClicked = (e) => {
     if (e.which > 1 && e.which < 4) return;
-    if (utils.isSleepTimerEnabled(prefs.expiration, Date.now())) return;
 
     e.preventDefault();
     e.stopImmediatePropagation();
-
     const a = e.currentTarget;
     utils.sendMessage(
       enums.LINK_CLICKED,
       {
+        hostname: location.hostname,
         anchorType: utils.determineAnchorType(a, location.origin, strategy),
         anchorUrl: a.href,
       },
