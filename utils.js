@@ -6,7 +6,7 @@ const utils = (function initUtils() {
         absolute: 'new-tab',
         tab: 'right',
         expiration: 0,
-        enabled: true
+        enabled: true,
       },
       options);
   }
@@ -96,6 +96,16 @@ const utils = (function initUtils() {
     });
   }
 
+  function sendMessageAllTabsMatchingHostname(message, hostname) {
+    chrome.tabs.query({}, (tabs) => {
+      tabs.forEach((tab) => {
+        if (utils.hasSameHostname(tab.url, hostname)) {
+          chrome.tabs.sendMessage(tab.id, message);
+        }
+      });
+    });
+  }
+
   function getOptions() {
     return new Promise((resolve) => {
       chrome.storage.sync.get(null, (storedOptions) => {
@@ -120,23 +130,10 @@ const utils = (function initUtils() {
     });
   }
 
-  function createNewTab(url, newTabPref) {
-    return tab => chrome.tabs.create({
-      url,
-      active: true,
-      index: this.getNewTabIndex(tab, newTabPref),
-    });
-  }
-
   function openInSameTab(url) {
     chrome.tabs.update({
       url,
     });
-  }
-
-  function openInNewTab(url, newTabPref) {
-    this.getActiveTabInCurrentWindow()
-      .then(this.createNewTab(url, newTabPref));
   }
 
   function getNewTabIndex(tabIndex, val) {
@@ -152,6 +149,19 @@ const utils = (function initUtils() {
     }
   }
 
+  function createNewTab(url, newTabPref) {
+    return tab => chrome.tabs.create({
+      url,
+      active: true,
+      index: getNewTabIndex(tab.index, newTabPref),
+    });
+  }
+
+  function openInNewTab(url, newTabPref) {
+    this.getActiveTabInCurrentWindow()
+      .then(createNewTab(url, newTabPref));
+  }
+
   return {
     getDefaultPrefs,
     shouldIgnore,
@@ -164,6 +174,7 @@ const utils = (function initUtils() {
     formToHash,
     setFormValues,
     sendMessage,
+    sendMessageAllTabsMatchingHostname,
     getActiveTabInCurrentWindow,
     getOptions,
     saveOptions,
