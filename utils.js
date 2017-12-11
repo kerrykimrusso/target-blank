@@ -152,7 +152,7 @@ const utils = (function initUtils() {
   function createNewTab(url, newTabPref) {
     return tab => chrome.tabs.create({
       url,
-      active: true,
+      active: false,
       index: getNewTabIndex(tab.index, newTabPref),
     });
   }
