@@ -1,5 +1,13 @@
-const init = (function init({ utils, strategy, location, enums }, MutationSummary) {
-  let mutationObserver;
+const init = (function init( // eslint-disable-line no-unused-vars
+  {
+    utils,
+    strategy,
+    location,
+    enums,
+  },
+  MutationSummary,
+) {
+  let mutationObserver; // eslint-disable-line no-unused-vars
 
   const onAnchorClicked = (e) => {
     if (e.which > 1 && e.which < 4) return;
@@ -62,5 +70,4 @@ const init = (function init({ utils, strategy, location, enums }, MutationSummar
       });
     })
     .catch(console.log);
-/* eslint-disable no-undef */
-}(window, MutationSummary));
+}(window, MutationSummary)); // eslint-disable-line no-undef
