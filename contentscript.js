@@ -10,11 +10,13 @@ const init = (function init( // eslint-disable-line no-unused-vars
   let mutationObserver; // eslint-disable-line no-unused-vars
 
   const onAnchorClicked = (e) => {
+    const a = e.currentTarget;
+    if (utils.shouldIgnore(a, strategy)) return;
     if (e.which > 1 && e.which < 4) return;
 
     e.preventDefault();
     e.stopImmediatePropagation();
-    const a = e.currentTarget;
+
     utils.sendMessage(
       enums.LINK_CLICKED,
       {
