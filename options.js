@@ -80,6 +80,19 @@ const init = (function init({ utils, enums, constants }) {
         };
       })
       .then(configureUI)
+      .then(() => {
+        const sendFeedbackLinkClicked = () => {
+          utils.getActiveTabInCurrentWindow()
+            .then(tab => chrome.tabs.sendMessage(tab.id, {
+              type: enums.FEEDBACK_CLICKED,
+              payload: true,
+            }));
+        };
+
+        document
+          .getElementById('feedbackLink')
+          .addEventListener('click', sendFeedbackLinkClicked);
+      })
       .catch(console.log);
   };
 }(window));

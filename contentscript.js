@@ -52,6 +52,12 @@ const init = (function init( // eslint-disable-line no-unused-vars
               removeClickHandlers(allAnchors);
             }
           },
+          [enums.FEEDBACK_CLICKED]: () => {
+            const feedbackAnchor = document.createElement('a');
+            feedbackAnchor.setAttribute('href', 'mailto:targetdashblank@gmail.com');
+            feedbackAnchor.setAttribute('target', '_blank');
+            feedbackAnchor.click();
+          },
         };
         messageHandlers[msg.type](msg.payload);
       });

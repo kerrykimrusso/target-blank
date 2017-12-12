@@ -4,6 +4,7 @@ const enums = Object.freeze({
   DISABLE_REQUESTED: 'disable requested',
   DISABLE_SUCCEEDED: 'disabled succeeded',
   LINK_CLICKED: 'link clicked',
+  FEEDBACK_CLICKED: 'feedback clicked',
 });
 
 try {
