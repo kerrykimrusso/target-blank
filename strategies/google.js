@@ -1,6 +1,7 @@
 const strategy = (function init(utils, origin) {
   function shouldIgnore(anchor) {
-    return /^Google (apps|Account)/.test(anchor.title);
+    return /^Google (apps|Account)/.test(anchor.title) ||
+      /noopener/.test(anchor.rel);
   }
 
   function shouldTreatAsRelative() {
