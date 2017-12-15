@@ -1,6 +1,7 @@
 const init = (function init({ utils, enums, constants }) {
   return () => {
     let configureUI;
+    let updateIcon;
 
     const objectifyForm = (form) => {
       const hash = utils.formToHash(form, {
@@ -19,20 +20,26 @@ const init = (function init({ utils, enums, constants }) {
         hostname,
         prefs: prefsForm ? objectifyForm(prefsForm) : utils.getDefaultPrefs(),
       }, ({ payload }) => {
-        configureUI({
+        const settings = {
           hostname,
           prefs: payload[hostname],
-        });
+        };
+
+        configureUI(settings);
+        updateIcon(settings);
       });
     };
 
     const disableForHostname = hostname => () => {
       utils.sendMessage(enums.DISABLE_REQUESTED, { hostname },
         ({ payload }) => {
-          configureUI({
+          const settings = {
             hostname,
             prefs: payload[hostname],
-          });
+          };
+
+          configureUI(settings);
+          updateIcon(settings);
         });
     };
 
@@ -71,6 +78,21 @@ const init = (function init({ utils, enums, constants }) {
       return settings;
     };
 
+    updateIcon = (settings) => {
+      const { prefs } = settings;
+      utils.getActiveTabInCurrentWindow()
+        .then((tab) => {
+          const path = prefs && prefs.enabled ?
+            'icons/icon_enabled.png' :
+            'icons/icon_disabled.png';
+
+          chrome.browserAction.setIcon({
+            path,
+            tabId: tab.id,
+          });
+        });
+    };
+
     Promise.all([utils.getOptions(), utils.getActiveTabInCurrentWindow()])
       .then(([options, activeTab]) => {
         const hostname = utils.getHostnameOfUrl(activeTab.url);
@@ -80,6 +102,7 @@ const init = (function init({ utils, enums, constants }) {
         };
       })
       .then(configureUI)
+      .then(updateIcon)
       .then(() => {
         const sendFeedbackLinkClicked = () => {
           utils.getActiveTabInCurrentWindow()
