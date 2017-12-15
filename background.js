@@ -52,6 +52,9 @@ const background = (function init({ utils, enums }) {
               }
             });
         },
+        [enums.SET_ICON]: (settings) => {
+          utils.updateIcon(settings);
+        }
       };
       messageHandlers[msg.type](msg.payload, sendResponse);
       return true; // allows async sendResponse call

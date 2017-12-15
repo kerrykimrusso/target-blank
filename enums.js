@@ -5,6 +5,7 @@ const enums = Object.freeze({
   DISABLE_SUCCEEDED: 'disabled succeeded',
   LINK_CLICKED: 'link clicked',
   FEEDBACK_CLICKED: 'feedback clicked',
+  SET_ICON: 'set icon'
 });
 
 try {

@@ -62,13 +62,14 @@ const init = (function init( // eslint-disable-line no-unused-vars
         messageHandlers[msg.type](msg.payload);
       });
       const prefs = options[location.hostname];
-      if (prefs && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
+      if (prefs && prefs.enabled && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
         addClickHandlers(document.querySelectorAll('a'));
+        utils.sendMessage(enums.SET_ICON, { prefs }, () => console.log('prefs sent'));
       }
 
       mutationObserver = new MutationSummary({
         callback: (summaryObjects) => {
-          if (prefs && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
+          if (prefs && prefs.enabled && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
             addClickHandlers(summaryObjects[0].added);
           }
         },

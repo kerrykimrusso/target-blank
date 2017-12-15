@@ -96,6 +96,22 @@ const utils = (function initUtils() {
     });
   }
 
+  function updateIcon(settings) {
+    const { prefs } = settings;
+    utils.getActiveTabInCurrentWindow()
+      .then((tab) => {
+        console.log(tab);
+        const path = prefs && prefs.enabled ?
+          'icons/icon_enabled.png' :
+          'icons/icon_disabled.png';
+        console.log(path);
+        chrome.browserAction.setIcon({
+          path,
+          tabId: tab.id,
+        });
+      });
+  };
+
   function sendMessageToAllTabsMatchingHostname(message, hostname) {
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach((tab) => {
@@ -182,6 +198,7 @@ const utils = (function initUtils() {
     openInSameTab,
     openInNewTab,
     getNewTabIndex,
+    updateIcon
   };
 }());
 
