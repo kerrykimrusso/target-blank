@@ -11,6 +11,13 @@ const utils = (function initUtils() {
       options);
   }
 
+  const ORIGIN_REGEX = /(?:\w+\.)*(\w+\.\w+)/i;
+  function hasSameDomain(a, b) {
+    const matchA = a.match(ORIGIN_REGEX);
+    const matchB = b.match(ORIGIN_REGEX);
+    return matchA && matchB && matchA[1] === matchB[1];
+  }
+
   const HOSTNAME_REGEX = /(\w+\.)*(\w+\.\w+)/i;
 
   function getHostnameOfUrl(url) {
@@ -100,17 +107,15 @@ const utils = (function initUtils() {
     const { prefs } = settings;
     utils.getActiveTabInCurrentWindow()
       .then((tab) => {
-        console.log(tab);
         const path = prefs && prefs.enabled ?
           'icons/icon_enabled.png' :
           'icons/icon_disabled.png';
-        console.log(path);
         chrome.browserAction.setIcon({
           path,
           tabId: tab.id,
         });
       });
-  };
+  }
 
   function sendMessageToAllTabsMatchingHostname(message, hostname) {
     chrome.tabs.query({}, (tabs) => {
@@ -180,6 +185,7 @@ const utils = (function initUtils() {
 
   return {
     getDefaultPrefs,
+    hasSameDomain,
     shouldIgnore,
     determineAnchorType,
     isSleepTimerEnabled,
@@ -198,7 +204,7 @@ const utils = (function initUtils() {
     openInSameTab,
     openInNewTab,
     getNewTabIndex,
-    updateIcon
+    updateIcon,
   };
 }());
 
