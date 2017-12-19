@@ -64,8 +64,9 @@ const init = (function init( // eslint-disable-line no-unused-vars
       const prefs = options[location.hostname];
       if (prefs && prefs.enabled && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
         addClickHandlers(document.querySelectorAll('a'));
-        utils.sendMessage(enums.SET_ICON, { prefs }, () => console.log('prefs sent'));
       }
+
+      utils.sendMessage(enums.SET_ICON, { prefs }, () => console.log('prefs sent'));
 
       mutationObserver = new MutationSummary({
         callback: (summaryObjects) => {
