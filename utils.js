@@ -107,9 +107,16 @@ const utils = (function initUtils() {
     const { prefs } = settings;
     utils.getActiveTabInCurrentWindow()
       .then((tab) => {
-        const path = prefs && prefs.enabled ?
-          'icons/icon_enabled.png' :
-          'icons/icon_disabled.png';
+        let path;
+        if (prefs) {
+          if (prefs.suspended) {
+            path = 'icons/icon_suspended.png';
+          } else if (prefs.enabled) {
+            path = 'icons/icon_enabled.png';
+          } else {
+            path = 'icons/icon_disabled.png';
+          }
+        }
         chrome.browserAction.setIcon({
           path,
           tabId: tab.id,
