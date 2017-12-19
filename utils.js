@@ -109,7 +109,7 @@ const utils = (function initUtils() {
       .then((tab) => {
         let path;
         if (prefs) {
-          if (prefs.suspended) {
+          if (prefs.suspendSwitch) {
             path = 'icons/icon_suspended.png';
           } else if (prefs.enabled) {
             path = 'icons/icon_enabled.png';
