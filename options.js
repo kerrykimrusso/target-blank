@@ -5,6 +5,7 @@ const init = (function init({ utils, enums, constants }) {
     const objectifyForm = (form) => {
       const hash = utils.formToHash(form, {
         suspendSwitch: input => input.checked,
+        focusSwitch: input => input.checked,
       });
       hash.expiration = hash.suspendSwitch ?
         utils.get2amTomorrowInMsFrom(new Date()) :
@@ -61,7 +62,9 @@ const init = (function init({ utils, enums, constants }) {
               status.textContent = '';
             }
           },
-
+          focusSwitch: (input) => {
+            input.checked = prefs.focusSwitch
+          }
         });
         optionsForm.addEventListener('change', savePrefsForHostname(hostname, optionsForm), { once: true });
 

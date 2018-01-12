@@ -46,7 +46,7 @@ const background = (function init({ utils, enums }) {
                     break;
                   case 'new-tab':
                   default:
-                    utils.openInNewTab(anchorUrl, prefs.tab);
+                    utils.openInNewTab(anchorUrl, prefs);
                     break;
                 }
               }
