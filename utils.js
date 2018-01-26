@@ -7,7 +7,7 @@ const utils = (function initUtils() {
         tab: 'right',
         expiration: 0,
         enabled: true,
-        focus: false
+        focus: false,
       },
       options);
   }
@@ -29,7 +29,7 @@ const utils = (function initUtils() {
   function hasSameHostname(a, b) {
     const matchA = this.getHostnameOfUrl(a);
     const matchB = this.getHostnameOfUrl(b);
-    return matchA && matchB && matchA[0] === matchB[0];
+    return matchA === matchB;
   }
 
   function isSleepTimerEnabled(expirationTimeInMs, curTimeInMs) {
