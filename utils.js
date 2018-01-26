@@ -7,6 +7,7 @@ const utils = (function initUtils() {
         tab: 'right',
         expiration: 0,
         enabled: true,
+        focus: false
       },
       options);
   }
@@ -180,8 +181,8 @@ const utils = (function initUtils() {
   function createNewTab(url, newTabPref) {
     return tab => chrome.tabs.create({
       url,
-      active: false,
-      index: getNewTabIndex(tab.index, newTabPref),
+      active: newTabPref.focusSwitch,
+      index: getNewTabIndex(tab.index, newTabPref.tab),
     });
   }
 
