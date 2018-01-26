@@ -16,26 +16,27 @@ const init = (function init({ utils, enums, constants }) {
 
     const savePrefsForHostname = (hostname, prefsForm) => (e) => {
       e.preventDefault();
+      const [subdomain, domain] = hostname;
       utils.sendMessage(enums.SAVE_OPTIONS_REQUESTED, {
         hostname,
         prefs: prefsForm ? objectifyForm(prefsForm) : utils.getDefaultPrefs(),
       }, ({ payload }) => {
         const settings = {
           hostname,
-          prefs: payload[hostname],
+          prefs: utils.getPrefs(payload, subdomain, domain),
         };
-
         configureUI(settings);
         utils.updateIcon(settings);
       });
     };
 
     const disableForHostname = hostname => () => {
+      const [subdomain, domain] = hostname;
       utils.sendMessage(enums.DISABLE_REQUESTED, { hostname },
         ({ payload }) => {
           const settings = {
             hostname,
-            prefs: payload[hostname],
+            prefs: payload[domain][subdomain],
           };
 
           configureUI(settings);
@@ -45,9 +46,8 @@ const init = (function init({ utils, enums, constants }) {
 
     configureUI = (settings) => {
       const { hostname, prefs } = settings;
-
       const title = document.querySelector('#hostname');
-      title.textContent = hostname;
+      title.textContent = hostname.filter(x => x !== '*').join('.');
 
       const optionsForm = document.querySelector('#optionsForm');
       const button = document.querySelector('#optBtn');
@@ -63,8 +63,8 @@ const init = (function init({ utils, enums, constants }) {
             }
           },
           focusSwitch: (input) => {
-            input.checked = prefs.focusSwitch
-          }
+            input.checked = prefs.focusSwitch;
+          },
         });
         optionsForm.addEventListener('change', savePrefsForHostname(hostname, optionsForm), { once: true });
 
@@ -82,10 +82,11 @@ const init = (function init({ utils, enums, constants }) {
 
     Promise.all([utils.getOptions(), utils.getActiveTabInCurrentWindow()])
       .then(([options, activeTab]) => {
-        const hostname = utils.getHostnameOfUrl(activeTab.url);
+        const hostname = utils.getSubDomainOfUrl(activeTab.url);
+        const [subdomain, domain] = hostname;
         return {
           hostname,
-          prefs: options[hostname],
+          prefs: utils.getPrefs(options, subdomain, domain),
         };
       })
       .then(configureUI)

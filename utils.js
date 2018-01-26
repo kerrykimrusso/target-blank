@@ -7,7 +7,7 @@ const utils = (function initUtils() {
         tab: 'right',
         expiration: 0,
         enabled: true,
-        focus: false,
+        focusSwitch: false,
       },
       options);
   }
@@ -20,6 +20,12 @@ const utils = (function initUtils() {
   }
 
   const HOSTNAME_REGEX = /(\w+\.)*(\w+\.\w+)/i;
+  const SUB_DOMAIN_REGEX = /((?:(\w+)\.)?(\w+)\.(\w+))/i;
+  function getSubDomainOfUrl(url) {
+    const [,, subdomain, ...domain] = url.match(SUB_DOMAIN_REGEX);
+    const normalizedSubdomain = subdomain && subdomain !== 'www' ? subdomain : '*';
+    return [normalizedSubdomain, domain.join('.')];
+  }
 
   function getHostnameOfUrl(url) {
     const matches = url.match(HOSTNAME_REGEX);
@@ -30,6 +36,24 @@ const utils = (function initUtils() {
     const matchA = this.getHostnameOfUrl(a);
     const matchB = this.getHostnameOfUrl(b);
     return matchA === matchB;
+  }
+
+  function getPrefs(options, subdomain, domain) {
+    if (domain in options) {
+      if (subdomain in options[domain]) return options[domain][subdomain];
+      return options[domain]['*'];
+    }
+    return null;
+  }
+
+  function updatePrefs(options, subdomain, domain, prefs) {
+    if (domain in options) {
+      options[domain] = Object.assign(options[domain], { [subdomain]: prefs });
+    } else {
+      options = { [domain]: { [subdomain]: prefs } };
+    }
+
+    return options;
   }
 
   function isSleepTimerEnabled(expirationTimeInMs, curTimeInMs) {
@@ -126,12 +150,22 @@ const utils = (function initUtils() {
   }
 
   function sendMessageToAllTabsMatchingHostname(message, hostname) {
+    const { payload: options } = message;
     chrome.tabs.query({}, (tabs) => {
-      tabs.forEach((tab) => {
-        if (tab.url && utils.hasSameHostname(tab.url, hostname)) {
-          chrome.tabs.sendMessage(tab.id, message);
-        }
-      });
+      const [subdomain, domain] = hostname;
+      if (subdomain === '*') {
+        tabs.forEach((tab) => {
+          if (utils.hasSameDomain(tab.url, domain) && !(subdomain in options[domain])) {
+            chrome.tabs.sendMessage(tab.id, message);
+          }
+        });
+      } else {
+        tabs.forEach((tab) => {
+          if (utils.hasSameHostname(tab.url, hostname.join('.'))) {
+            chrome.tabs.sendMessage(tab.id, message);
+          }
+        });
+      }
     });
   }
 
@@ -213,6 +247,9 @@ const utils = (function initUtils() {
     openInNewTab,
     getNewTabIndex,
     updateIcon,
+    getPrefs,
+    getSubDomainOfUrl,
+    updatePrefs,
   };
 }());
 
