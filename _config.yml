@@ -1,4 +1,0 @@
-theme: jekyll-theme-cayman
-include: README.md
-kramdown:
-  input: GFM
