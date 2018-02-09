@@ -1,12 +1,14 @@
 const background = (function init({ utils, enums }) {
   const defaultOptions = {
-    'www.google.com': utils.getDefaultPrefs(),
-    'www.yahoo.com': utils.getDefaultPrefs(),
-    'www.bing.com': utils.getDefaultPrefs(),
-    'www.baidu.com': utils.getDefaultPrefs(),
-    'www.duckduckgo.com': utils.getDefaultPrefs(),
-    'www.wikipedia.org': utils.getDefaultPrefs({ relative: 'new-tab' }),
-    'developer.mozilla.org': utils.getDefaultPrefs({ relative: 'new-tab' }),
+    'google.com': { '*': utils.getDefaultPrefs() },
+    'yahoo.com': { '*': utils.getDefaultPrefs() },
+    'bing.com': { '*': utils.getDefaultPrefs() },
+    'baidu.com': { '*': utils.getDefaultPrefs() },
+    'duckduckgo.com': { '*': utils.getDefaultPrefs() },
+    'wikipedia.org': { '*': utils.getDefaultPrefs({ relative: 'new-tab' }) },
+    'mozilla.org': {
+      developer: utils.getDefaultPrefs({ relative: 'new-tab' }),
+    },
   };
 
   const listenForRuntimeMessages = () => {
@@ -14,8 +16,12 @@ const background = (function init({ utils, enums }) {
       const messageHandlers = {
         [enums.SAVE_OPTIONS_REQUESTED]: ({ hostname, prefs }) => {
           prefs.enabled = true;
-          utils.saveOptions({ [hostname]: prefs })
-            .then(utils.getOptions)
+          utils.getOptions()
+            .then((options) => {
+              const [subdomain, domain] = hostname;
+              return utils.updatePrefs(options, subdomain, domain, prefs);
+            })
+            .then(utils.saveOptions)
             .then((options) => {
               const message = {
                 type: enums.SAVE_OPTIONS_SUCCEEDED,
@@ -26,7 +32,8 @@ const background = (function init({ utils, enums }) {
             });
         },
         [enums.DISABLE_REQUESTED]: ({ hostname }) => {
-          utils.saveOptions({ [hostname]: { enabled: false } })
+          const [subdomain, domain] = hostname;
+          utils.saveOptions({ [domain]: { [subdomain]: { enabled: false } } })
             .then(utils.getOptions)
             .then((options) => {
               sendResponse({
@@ -36,9 +43,10 @@ const background = (function init({ utils, enums }) {
             });
         },
         [enums.LINK_CLICKED]: ({ hostname, anchorType, anchorUrl }) => {
+          const [subdomain, domain] = utils.getSubDomainOfUrl(hostname);
           utils.getOptions()
             .then((options) => {
-              const prefs = options[hostname];
+              const prefs = utils.getPrefs(options, subdomain, domain);
               if (prefs && prefs.enabled) {
                 switch (prefs[anchorType]) {
                   case 'same-tab':

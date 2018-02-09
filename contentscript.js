@@ -44,7 +44,8 @@ const init = (function init( // eslint-disable-line no-unused-vars
       chrome.runtime.onMessage.addListener((msg) => {
         const messageHandlers = {
           [enums.SAVE_OPTIONS_SUCCEEDED]: (newOptions) => {
-            const newPrefs = newOptions[location.hostname];
+            const [subdomain, domain] = utils.getSubDomainOfUrl(location.hostname);
+            const newPrefs = utils.getPrefs(newOptions, subdomain, domain);
             const allAnchors = document.querySelectorAll('a');
             if (newPrefs && !utils.isSleepTimerEnabled(newPrefs.expiration, Date.now())) {
               addClickHandlers(allAnchors);
@@ -61,7 +62,8 @@ const init = (function init( // eslint-disable-line no-unused-vars
         };
         messageHandlers[msg.type](msg.payload);
       });
-      const prefs = options[location.hostname];
+      const [subdomain, domain] = utils.getSubDomainOfUrl(location.hostname);
+      const prefs = utils.getPrefs(options, subdomain, domain);
       if (prefs && prefs.enabled && !utils.isSleepTimerEnabled(prefs.expiration, Date.now())) {
         addClickHandlers(document.querySelectorAll('a'));
       }
