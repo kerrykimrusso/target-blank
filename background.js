@@ -52,6 +52,9 @@ const background = (function init({ utils, enums }) {
                   case 'same-tab':
                     utils.openInSameTab(anchorUrl);
                     break;
+                  case 'same-new-tab':
+                    utils.openInSameNewTab(anchorUrl, prefs);
+                    break;
                   case 'new-tab':
                   default:
                     utils.openInNewTab(anchorUrl, prefs);
