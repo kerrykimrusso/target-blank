@@ -212,6 +212,7 @@ const utils = (function initUtils() {
     }
   }
 
+  var newTabId = null;
   function createNewTab(url, newTabPref) {
     return tab => chrome.tabs.create({
       url,
@@ -220,7 +221,7 @@ const utils = (function initUtils() {
     },
     (tab) => {
       newTabId = tab.id;
-      chrome.tabs.onRemoved.addListener(() => newTabId = null);
+      chrome.tabs.onRemoved.addListener((closedTabId) => newTabId = (closedTabId === newTabId) ? null : newTabId);
     }
     );
   }
@@ -239,7 +240,6 @@ const utils = (function initUtils() {
       .then(createNewTab(url, newTabPref));
   }
 
-  var newTabId = null;
   function openInSameNewTab(url, newTabPref) {
     if (newTabId) {
       this.getActiveTabInCurrentWindow()
