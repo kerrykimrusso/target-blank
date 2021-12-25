@@ -217,12 +217,37 @@ const utils = (function initUtils() {
       url,
       active: newTabPref.focusSwitch,
       index: getNewTabIndex(tab.index, newTabPref.tab),
-    });
+    },
+    (tab) => {
+      newTabId = tab.id;
+      chrome.tabs.onRemoved.addListener(() => newTabId = null);
+    }
+    );
+  }
+
+  function updateNewTab(url, newTabPref) {
+    return tab => chrome.tabs.update(
+      newTabId, {
+        url,
+        active: newTabPref.focusSwitch,
+      }
+    );
   }
 
   function openInNewTab(url, newTabPref) {
     this.getActiveTabInCurrentWindow()
       .then(createNewTab(url, newTabPref));
+  }
+
+  var newTabId = null;
+  function openInSameNewTab(url, newTabPref) {
+    if (newTabId) {
+      this.getActiveTabInCurrentWindow()
+        .then(updateNewTab(url, newTabPref));
+    } else {
+      this.getActiveTabInCurrentWindow()
+        .then(createNewTab(url, newTabPref));
+    }
   }
 
   return {
@@ -245,6 +270,7 @@ const utils = (function initUtils() {
     removeFromOptions,
     openInSameTab,
     openInNewTab,
+    openInSameNewTab,
     getNewTabIndex,
     updateIcon,
     getPrefs,
